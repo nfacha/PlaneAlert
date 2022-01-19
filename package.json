@@ -1,0 +1,30 @@
+{
+  "name": "planealert",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc && node build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nfacha/PlaneAlert.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nfacha/PlaneAlert/issues"
+  },
+  "homepage": "https://github.com/nfacha/PlaneAlert#readme",
+  "dependencies": {
+    "@types/node": "^17.0.10",
+    "axios": "^0.25.0",
+    "pg": "^8.7.1",
+    "ts-node": "^10.4.0",
+    "tslog": "^3.3.1",
+    "typeorm": "^0.2.41"
+  }
+}
