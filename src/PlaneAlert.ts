@@ -13,46 +13,44 @@ class PlaneAlertMain {
     public db: any;
     public config: any;
     public trackSource: OpenSkySource | undefined;
+    public airports: any = [];
+    public regions: any = [];
+    public countries: any = [];
 
 
     constructor() {
         this.log = new Logger();
         this.log.info("PlaneAlert started");
         this.config = this.loadConfig();
+        const csvToJson = require('convert-csv-to-json');
         //check if file exists
-        if (!fs.existsSync('data/airports.csv')) {
-            this.log.info("airports.csv not found, downloading...");
-            axios({
-                url: 'https://davidmegginson.github.io/ourairports-data/airports.csv',
-                method: 'GET',
-            }).then((response) => {
-                fs.writeFileSync('data/airports.csv', response.data);
-                this.log.info("airports.csv downloaded");
-            });
-
-        }
-        if (!fs.existsSync('data/regions.csv')) {
-            this.log.info("regions.csv not found, downloading...");
-            axios({
-                url: 'https://davidmegginson.github.io/ourairports-data/regions.csv',
-                method: 'GET',
-            }).then((response) => {
-                fs.writeFileSync('data/regions.csv', response.data);
-                this.log.info("regions.csv downloaded");
-            });
-
-        }
-        if (!fs.existsSync('data/countries.csv')) {
-            this.log.info("countries.csv not found, downloading...");
-            axios({
-                url: 'https://davidmegginson.github.io/ourairports-data/countries.csv',
-                method: 'GET',
-            }).then((response) => {
-                fs.writeFileSync('data/countries.csv', response.data);
-                this.log.info("countries.csv downloaded");
-            });
-
-        }
+        axios({
+            url: 'https://davidmegginson.github.io/ourairports-data/airports.csv',
+            method: 'GET',
+        }).then((response) => {
+            fs.writeFileSync('data/airports.csv', response.data);
+            fs.writeFileSync('data/airports.json', JSON.stringify(csvToJson.fieldDelimiter(',').getJsonFromCsv('data/airports.csv')));
+            this.airports = JSON.parse(fs.readFileSync("data/airports.json", "utf8"));
+            this.log.info("Airport Data Updated");
+        });
+        axios({
+            url: 'https://davidmegginson.github.io/ourairports-data/regions.csv',
+            method: 'GET',
+        }).then((response) => {
+            fs.writeFileSync('data/regions.csv', response.data);
+            fs.writeFileSync('data/regions.json', JSON.stringify(csvToJson.fieldDelimiter(',').getJsonFromCsv('data/regions.csv')));
+            this.regions = JSON.parse(fs.readFileSync("data/regions.json", "utf8"));
+            this.log.info("Regions Data Updated");
+        });
+        axios({
+            url: 'https://davidmegginson.github.io/ourairports-data/countries.csv',
+            method: 'GET',
+        }).then((response) => {
+            fs.writeFileSync('data/countries.csv', response.data);
+            fs.writeFileSync('data/countries.json', JSON.stringify(csvToJson.fieldDelimiter(',').getJsonFromCsv('data/countries.csv')));
+            this.countries = JSON.parse(fs.readFileSync("data/countries.json", "utf8"));
+            this.log.info("Countries Data Updated");
+        });
         this.initDatabase().then(async () => {
             if (this.db.isConnected) {
                 this.log.info("Database initialized");
