@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, IsNull, Not, PrimaryGeneratedColumn} from "typeorm";
 import {PlaneAlert} from "../PlaneAlert";
 import {PlaneEvents} from "../PlaneEvents";
 import {GeoUtils} from "../utils/GeoUtils";
@@ -76,12 +76,44 @@ export class Plane extends BaseEntity{
                 } else {
                     PlaneAlert.log.info(`Plane ${this.icao} is taking off`);
                 }
+                await flight.save();
+            }
+            if (data.onGround
+                && data.barometricAltitude !== null
+                && data.barometricAltitude < PlaneAlert.config['landingAltitudeThreshold']
+                && !this.on_ground) {
+                PlaneAlert.log.info(`Plane ${this.icao} is landingg`);
+                //Plane landing
+                const nearestAirport = this.findNearestAirport();
+                let flight = await Flight.findOne({
+                    where: {plane_id: this.id, arrival_time: Not(IsNull())},
+                    order: {id: 'DESC'}
+                });
+                if (flight === undefined) {
+                    flight = new Flight();
+                    flight.plane_id = this.id;
+                    flight.callsign = data.callsign;
+                    flight.squawk = data.squawk;
+                }
+                flight.arrival_time = new Date();
+                if (nearestAirport?.airport !== null) {
+                    PlaneAlert.log.info(`Plane ${this.icao} is landing on ${nearestAirport?.airport.name}`);
+                    flight.arrival_airport = nearestAirport?.airport.ident;
+                } else {
+                    PlaneAlert.log.info(`Plane ${this.icao} is landing`);
+                }
                 flight.save();
             }
             this.on_ground = data.onGround;
             this.live_track = true;
             this.last_seen = new Date();
-        }else{
+        }else {
+            const lostTime = new Date(this.last_seen.getTime());
+            lostTime.setMinutes(lostTime.getMinutes() + PlaneAlert.config['landingSignalLostThreshold']);
+            if (lostTime < new Date()) {
+                PlaneAlert.log.info(`Plane ${this.icao} is lost`);
+                this.live_track = false;
+            }
             this.live_track = false;
         }
         this.last_refresh = new Date();

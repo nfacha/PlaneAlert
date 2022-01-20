@@ -1,4 +1,7 @@
 {
   "trackSource": "OPSN",
-  "takeoffAltitudeThreshold": 20000
+  "takeoffAltitudeThreshold": 10000,
+  "landingAltitudeThreshold": 10000,
+  "landingSignalLostThreshold": 1,
+  "landingNearestSuitableAirportDistance": 5
 }
