@@ -1,3 +1,4 @@
 {
-  "trackSource": "OPSN"
+  "trackSource": "OPSN",
+  "takeoffAltitudeThreshold": 20000
 }
