@@ -2,6 +2,7 @@ import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 import {PlaneAlert} from "../PlaneAlert";
 import {PlaneEvents} from "../PlaneEvents";
 import {GeoUtils} from "../utils/GeoUtils";
+import {Flight} from "./Flight";
 
 @Entity()
 export class Plane extends BaseEntity{
@@ -20,6 +21,9 @@ export class Plane extends BaseEntity{
 
     @Column({type: "boolean", default: true})
     active!: boolean;
+
+    @Column({type: "varchar", length: 255, default: "large_airport,medium_airport,small_airport"})
+    allowed_airports!: string;
 
     @Column({type: "integer", default: 1800})
     refresh_interval!: number;
@@ -53,21 +57,26 @@ export class Plane extends BaseEntity{
         }
         if(data !== null) {
             if (data.latitude !== null && data.longitude !== null) {
-                this.last_lat = data.latitude * 1E6;
-                this.last_lng = data.longitude * 1E6;
-                // PlaneAlert.log.debug(this.findNearestAirport());
+                this.last_lat = Math.round(data.latitude * 1E6);
+                this.last_lng = Math.round(data.longitude * 1E6);
             }
             if (!data.onGround
                 && data.barometricAltitude !== null && data.barometricAltitude < PlaneAlert.config['takeoffAltitudeThreshold']
                 && (!this.live_track || data.onGround)) {
                 //Plane takeoff
                 const nearestAirport = this.findNearestAirport();
-                if (nearestAirport?.airport !== null){
-                    PlaneAlert.log.info(`Plane ${this.icao} is taking off from ${nearestAirport?.airport['"name"']}`);
-                }else{
+                const flight = new Flight();
+                flight.plane_id = this.id;
+                flight.departure_time = new Date();
+                flight.callsign = data.callsign;
+                flight.squawk = data.squawk;
+                if (nearestAirport?.airport !== null) {
+                    PlaneAlert.log.info(`Plane ${this.icao} is taking off from ${nearestAirport?.airport.name}`);
+                    flight.departure_airport = nearestAirport?.airport.ident;
+                } else {
                     PlaneAlert.log.info(`Plane ${this.icao} is taking off`);
                 }
-
+                flight.save();
             }
             this.on_ground = data.onGround;
             this.live_track = true;
@@ -92,9 +101,16 @@ export class Plane extends BaseEntity{
         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) searching for nearest airport of ${this.last_lat/1E6}/${this.last_lng/1E6}`);
         let min_distance = Number.MAX_SAFE_INTEGER;
         let nearest_airport = null;
-        for(const airport of PlaneAlert.airports){
-            const distance = GeoUtils.distanceBetweenCoordinates(this.last_lat/1E6, this.last_lng/1E6, airport['"latitude_deg"'], airport['"longitude_deg"']);
-            if(distance < min_distance){
+        const allowedAirportsArray = this.allowed_airports.split(",");
+        for(const airport of PlaneAlert.airports) {
+            if (airport.type === 'closed') {
+                continue;
+            }
+            if (allowedAirportsArray.indexOf(airport.ident) === -1) {
+                continue;
+            }
+            const distance = GeoUtils.distanceBetweenCoordinates(this.last_lat / 1E6, this.last_lng / 1E6, airport.latitude_deg, airport.longitude_deg);
+            if (distance < min_distance) {
                 min_distance = distance;
                 nearest_airport = airport;
             }

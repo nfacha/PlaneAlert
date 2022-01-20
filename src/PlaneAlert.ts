@@ -5,7 +5,7 @@ import * as fs from "fs";
 import {TrackSource} from "./enum/TrackSource";
 import {OpenSkySource} from "./tracksources/OpenSkySource";
 import axios from "axios";
-
+import {Flight} from "./entities/Flight";
 
 
 class PlaneAlertMain {
@@ -28,7 +28,7 @@ class PlaneAlertMain {
             url: 'https://davidmegginson.github.io/ourairports-data/airports.csv',
             method: 'GET',
         }).then((response) => {
-            fs.writeFileSync('data/airports.csv', response.data);
+            fs.writeFileSync('data/airports.csv', response.data.replace(/"/g, ''));
             fs.writeFileSync('data/airports.json', JSON.stringify(csvToJson.fieldDelimiter(',').getJsonFromCsv('data/airports.csv')));
             this.airports = JSON.parse(fs.readFileSync("data/airports.json", "utf8"));
             this.log.info("Airport Data Updated");
@@ -37,7 +37,7 @@ class PlaneAlertMain {
             url: 'https://davidmegginson.github.io/ourairports-data/regions.csv',
             method: 'GET',
         }).then((response) => {
-            fs.writeFileSync('data/regions.csv', response.data);
+            fs.writeFileSync('data/regions.csv', response.data.replace(/"/g, ''));
             fs.writeFileSync('data/regions.json', JSON.stringify(csvToJson.fieldDelimiter(',').getJsonFromCsv('data/regions.csv')));
             this.regions = JSON.parse(fs.readFileSync("data/regions.json", "utf8"));
             this.log.info("Regions Data Updated");
@@ -46,7 +46,7 @@ class PlaneAlertMain {
             url: 'https://davidmegginson.github.io/ourairports-data/countries.csv',
             method: 'GET',
         }).then((response) => {
-            fs.writeFileSync('data/countries.csv', response.data);
+            fs.writeFileSync('data/countries.csv', response.data.replace(/"/g, ''));
             fs.writeFileSync('data/countries.json', JSON.stringify(csvToJson.fieldDelimiter(',').getJsonFromCsv('data/countries.csv')));
             this.countries = JSON.parse(fs.readFileSync("data/countries.json", "utf8"));
             this.log.info("Countries Data Updated");
@@ -75,7 +75,8 @@ class PlaneAlertMain {
                 password: "123456789",
                 database: "planealert",
                 entities: [
-                    Plane
+                    Plane,
+                    Flight,
                 ],
                 logging: false,
                 synchronize: true,
@@ -90,21 +91,23 @@ class PlaneAlertMain {
     }
 
     private async updatePlaneData() {
-        const planes = await Plane.find({
-            where: [
-                {
-                    active: true,
-                    next_refresh: LessThan(new Date()),
-                },
-                {
-                    active: true,
-                    next_refresh: null,
-                }
-            ]
-        });
-        for (const plane of planes) {
-            this.log.info("Updating plane: " + plane.icao);
-            await plane.update();
+        if (PlaneAlert.airports.length > 0) {
+            const planes = await Plane.find({
+                where: [
+                    {
+                        active: true,
+                        next_refresh: LessThan(new Date()),
+                    },
+                    {
+                        active: true,
+                        next_refresh: null,
+                    }
+                ]
+            });
+            for (const plane of planes) {
+                this.log.info("Updating plane: " + plane.icao);
+                await plane.update();
+            }
         }
         setTimeout(() => {
             this.updatePlaneData();
