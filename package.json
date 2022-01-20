@@ -2,12 +2,12 @@
   "name": "planealert",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "PlaneAlert.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node build/index.js",
-    "dev": "tsc && node build/index.js"
+    "start": "node build/PlaneAlert.js",
+    "dev": "tsc && node build/PlaneAlert.js"
   },
   "repository": {
     "type": "git",
