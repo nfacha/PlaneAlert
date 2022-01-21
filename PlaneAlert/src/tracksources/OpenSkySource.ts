@@ -1,7 +1,6 @@
 import axios from "axios";
 import {PlaneAlert} from "../PlaneAlert";
 import {PlaneTrackResponse} from "./PlaneTrackResponse";
-import {Plane} from "../entities/Plane";
 import {TrackSource} from "./TrackSource";
 
 export class OpenSkySource implements TrackSource{
@@ -9,7 +8,7 @@ export class OpenSkySource implements TrackSource{
 
     public async getPlaneStatus(icao24: string): Promise<PlaneTrackResponse|null>{
         PlaneAlert.log.debug(`Getting plane status for ${icao24} from OPSN`);
-        const rx = await axios.get(`${this.BASE}states/all?icao24=${icao24}`)
+        const rx = await axios.get(`${this.BASE}states/all?icao24=${icao24.toLowerCase()}`)
         if(rx.data['states'] === null){
             return null;
         }
