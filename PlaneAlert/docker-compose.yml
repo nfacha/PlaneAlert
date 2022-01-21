@@ -38,10 +38,10 @@ services:
 
   api:
     build:
-      context: ./PlaneAlertAPI
+      context: ../PlaneAlertAPI
       dockerfile: Dockerfile
     volumes:
-      - ./PlaneAlertAPI/:/app
+      - ../PlaneAlertAPI/:/app
     ports:
       - 3000
     depends_on:
