@@ -3,18 +3,15 @@ version: '3'
 services:
   postgres:
     image: postgres
-    environment:
-      POSTGRES_PASSWORD: "123456789"
-    ports:
-      - "5432:5432"
+    env_file:
+      - pg.env
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
-      PGADMIN_DEFAULT_PASSWORD: "123456789"
+    env_file:
+      - pdadmin.env
     ports:
       - "8888:80"
     volumes:
@@ -22,6 +19,14 @@ services:
     depends_on:
       - postgres
 
+  planealert:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    depends_on:
+      - postgres
 volumes:
   postgres-data:
   pgadmin-data:

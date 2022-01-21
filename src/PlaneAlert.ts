@@ -69,7 +69,7 @@ class PlaneAlertMain {
         try {
             this.db = await createConnection({
                 type: "postgres",
-                host: "localhost",
+                host: "postgres",
                 port: 5432,
                 username: "postgres",
                 password: "123456789",
@@ -82,6 +82,7 @@ class PlaneAlertMain {
                 synchronize: true,
             });
         } catch (e) {
+            this.log.fatal(e);
             this.log.fatal("Database connection failed")
         }
     }
