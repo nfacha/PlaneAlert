@@ -1,0 +1,3 @@
+[submodule "PlaneAlertAPI"]
+	path = PlaneAlertAPI
+	url = https://github.com/nfacha/PlaneAlertAPI.git

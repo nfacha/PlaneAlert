@@ -3,6 +3,8 @@ version: '3'
 services:
   postgres:
     image: postgres
+    ports:
+      - "5432:5432"
     env_file:
       - pg.env
     volumes:
@@ -11,7 +13,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     env_file:
-      - pdadmin.env
+      - pgadmin.env
     ports:
       - "8888:80"
     volumes:
