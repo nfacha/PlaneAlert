@@ -23,6 +23,7 @@ services:
       - traefik.http.routers.pgadmin.rule=Host(`db.plane-alert.facha.dev`)
       - traefik.http.routers.pgadmin.tls=true
       - traefik.http.routers.pgadmin.entrypoints=https
+      - traefik.http.routers.pgadmin.tls.certresolver=certresolver
 
   planealert:
     build:
@@ -41,12 +42,17 @@ services:
       - --entrypoints.https.address=:443
       - --accesslog
       - --providers.docker.exposedbydefault=false
+      - --certificatesresolvers.certresolver.acme.email=nuno@facha.dev
+      - --certificatesresolvers.certresolver.acme.storage=/acme.json
+      - --certificatesresolvers.certresolver.acme.httpchallenge=true
+      - --certificatesresolvers.certresolver.acme.httpchallenge.entrypoint=http
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /root/acme.json:/acme.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:[a-z-.]+}`)"
