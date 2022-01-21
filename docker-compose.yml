@@ -11,7 +11,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     env_file:
-      - pdadmin.env
+      - pgadmin.env
     ports:
       - "8888:80"
     volumes:
