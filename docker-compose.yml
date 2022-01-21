@@ -18,6 +18,11 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
       - postgres
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pgadmin.rule=Host(`db.plane-alert.facha.dev`)
+      - traefik.http.routers.pgadmin.tls=true
+      - traefik.http.routers.pgadmin.entrypoints=https
 
   planealert:
     build:
@@ -27,6 +32,29 @@ services:
       - ./:/app
     depends_on:
       - postgres
+  traefik:
+    image: traefik:v2.4
+    command:
+      - --api.insecure=true
+      - --providers.docker
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --accesslog
+      - --providers.docker.exposedbydefault=false
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:[a-z-.]+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=http"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+
 volumes:
   postgres-data:
   pgadmin-data:
