@@ -4,6 +4,7 @@ import {PlaneEvents} from "../PlaneEvents";
 import {GeoUtils} from "../utils/GeoUtils";
 import {Flight} from "./Flight";
 import {Webhook} from "discord-webhook-node";
+import axios from "axios";
 
 @Entity()
 export class Plane extends BaseEntity{
@@ -147,14 +148,21 @@ export class Plane extends BaseEntity{
         this.save();
     }
 
-    private triggerEvent(event: PlaneEvents, flight: Flight) {
+    private async triggerEvent(event: PlaneEvents, flight: Flight) {
         PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
-
+        let photoUrl = null;
+        const photoData = await axios.get('https://api.planespotters.net/pub/photos/hex/' + this.icao);
+        if (photoData.status === 200 && photoData.data.photos.length > 0) {
+            photoUrl = photoData.data.photos[0].thumbnail_large.src
+        }
         switch (event) {
             case PlaneEvents.PLANE_LAND:
                 if (this.discord_webhook !== null) {
                     const hook = new Webhook(this.discord_webhook);
                     hook.setUsername(this.name);
+                    if (photoUrl !== null) {
+                        hook.setAvatar(photoUrl);
+                    }
                     hook.send(`**${this.name}** (${this.registration}) landed on **${flight.arrival_airport}** at ${flight.arrival_time.toLocaleString()}`);
                 }
                 break;
@@ -162,6 +170,9 @@ export class Plane extends BaseEntity{
                 if (this.discord_webhook !== null) {
                     const hook = new Webhook(this.discord_webhook);
                     hook.setUsername(this.name);
+                    if (photoUrl !== null) {
+                        hook.setAvatar(photoUrl);
+                    }
                     hook.send(`**${this.name}** (${this.registration}) takeoff from **${flight.departure_airport}** at ${flight.departure_time.toLocaleString()} with the callsign **${flight.callsign}**, squawk **${flight.squawk}**`);
                 }
                 break;
