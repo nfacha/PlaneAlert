@@ -4,6 +4,7 @@
   "landingAltitudeThreshold": 10000,
   "landingSignalLostThreshold": 5,
   "landingNearestSuitableAirportDistance": 5,
+  "databaseHost": "postgres",
   "databaseName": "planealert",
   "databaseUsername": "postgres",
   "databasePassword": "123456789"

@@ -69,7 +69,7 @@ class PlaneAlertMain {
         try {
             this.db = await createConnection({
                 type: "postgres",
-                host: "postgres",
+                host: this.config['databaseHost'],
                 port: 5432,
                 username: this.config['databaseUsername'],
                 password: this.config['databasePassword'],
