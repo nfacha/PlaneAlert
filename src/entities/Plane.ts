@@ -46,10 +46,10 @@ export class Plane extends BaseEntity{
     live_track!: boolean;
 
     @Column({type: "integer", nullable: true})
-    last_lat!: number;
+    last_lat!: number | null;
 
     @Column({type: "integer", nullable: true})
-    last_lng!: number;
+    last_lng!: number | null;
 
     @Column({type: "text", nullable: true})
     discord_webhook!: string;
@@ -65,6 +65,9 @@ export class Plane extends BaseEntity{
             if (data.latitude !== null && data.longitude !== null) {
                 this.last_lat = Math.round(data.latitude * 1E6);
                 this.last_lng = Math.round(data.longitude * 1E6);
+            } else {
+                this.last_lat = null;
+                this.last_lng = null;
             }
             if (!data.onGround
                 && data.barometricAltitude !== null && data.barometricAltitude < PlaneAlert.config['takeoffAltitudeThreshold']
