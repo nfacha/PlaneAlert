@@ -33,6 +33,24 @@ services:
       - ./:/app
     depends_on:
       - postgres
+
+  api:
+    build:
+      context: ./PlaneAlertAPI
+      dockerfile: Dockerfile
+    volumes:
+      - ./PlaneAlertAPI/:/app
+    ports:
+      - 3000
+    depends_on:
+      - postgres
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`api.plane-alert.facha.dev`)
+      - traefik.http.routers.api.tls=true
+      - traefik.http.routers.api.entrypoints=https
+      - traefik.http.routers.api.tls.certresolver=certresolver
+
   traefik:
     image: traefik:v2.4
     command:
