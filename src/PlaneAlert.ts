@@ -71,9 +71,9 @@ class PlaneAlertMain {
                 type: "postgres",
                 host: "postgres",
                 port: 5432,
-                username: "postgres",
-                password: "123456789",
-                database: "planealert",
+                username: this.config['databaseUsername'],
+                password: this.config['databasePassword'],
+                database: this.config['databaseName'],
                 entities: [
                     Plane,
                     Flight,
