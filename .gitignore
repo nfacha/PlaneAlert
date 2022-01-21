@@ -1,9 +1,2 @@
-node_modules
-.idea
-build/*.js
-build/*/*.js
-data/*.csv
-data/*.json
-pg.env
-pgadmin.env
-config.json
+
+.idea/
