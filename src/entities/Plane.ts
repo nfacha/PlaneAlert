@@ -3,6 +3,7 @@ import {PlaneAlert} from "../PlaneAlert";
 import {PlaneEvents} from "../PlaneEvents";
 import {GeoUtils} from "../utils/GeoUtils";
 import {Flight} from "./Flight";
+import {Webhook} from "discord-webhook-node";
 
 @Entity()
 export class Plane extends BaseEntity{
@@ -44,18 +45,22 @@ export class Plane extends BaseEntity{
     live_track!: boolean;
 
     @Column({type: "integer", nullable: true})
-   last_lat!: number;
+    last_lat!: number;
 
     @Column({type: "integer", nullable: true})
     last_lng!: number;
+
+    @Column({type: "text", nullable: true})
+    discord_webhook!: string;
+
     ////////////////////////////////////////////////////////////////
 
-    public async update(){
+    public async update() {
         const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
-        if(data === undefined){
+        if (data === undefined) {
             return;
         }
-        if(data !== null) {
+        if (data !== null) {
             if (data.latitude !== null && data.longitude !== null) {
                 this.last_lat = Math.round(data.latitude * 1E6);
                 this.last_lng = Math.round(data.longitude * 1E6);
@@ -76,7 +81,8 @@ export class Plane extends BaseEntity{
                 } else {
                     PlaneAlert.log.info(`Plane ${this.icao} is taking off`);
                 }
-                await flight.save();
+                flight.save();
+                this.triggerEvent(PlaneEvents.PLANE_TAKEOFF, flight);
             }
             if (data.onGround
                 && data.barometricAltitude !== null
@@ -102,17 +108,36 @@ export class Plane extends BaseEntity{
                 } else {
                     PlaneAlert.log.info(`Plane ${this.icao} is landing`);
                 }
-                flight.save();
+                await flight.save();
+                this.triggerEvent(PlaneEvents.PLANE_LAND, flight);
             }
             this.on_ground = data.onGround;
             this.live_track = true;
             this.last_seen = new Date();
         }else {
-            const lostTime = new Date(this.last_seen.getTime());
-            lostTime.setMinutes(lostTime.getMinutes() + PlaneAlert.config['landingSignalLostThreshold']);
-            if (lostTime < new Date()) {
-                PlaneAlert.log.info(`Plane ${this.icao} is lost`);
-                this.live_track = false;
+            if (!this.on_ground) {
+                const lostTime = new Date(this.last_seen.getTime());
+                lostTime.setMinutes(lostTime.getMinutes() + PlaneAlert.config['landingSignalLostThreshold']);
+                if (lostTime < new Date()) {
+                    PlaneAlert.log.info(`Plane ${this.icao} is lost`);
+                    const nearestAirport = this.findNearestAirport();
+                    let flight = await Flight.findOne({
+                        where: {plane_id: this.id, arrival_time: Not(IsNull())},
+                        order: {id: 'DESC'}
+                    });
+                    if (flight === undefined) {
+                        flight = new Flight();
+                        flight.plane_id = this.id;
+                    }
+                    flight.arrival_time = new Date();
+                    if (nearestAirport?.airport !== null) {
+                        PlaneAlert.log.info(`Plane ${this.icao} is landing on ${nearestAirport?.airport.name}`);
+                        flight.arrival_airport = nearestAirport?.airport.ident;
+                    }
+                    this.on_ground = true;
+                    await flight.save();
+                    this.triggerEvent(PlaneEvents.PLANE_LAND, flight);
+                }
             }
             this.live_track = false;
         }
@@ -122,15 +147,34 @@ export class Plane extends BaseEntity{
         this.save();
     }
 
-    private triggerEvent(event: PlaneEvents, data: any){
-        PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) trigered  ${event}`);
+    private triggerEvent(event: PlaneEvents, flight: Flight) {
+        PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
+
+        switch (event) {
+            case PlaneEvents.PLANE_LAND:
+                if (this.discord_webhook !== null) {
+                    const hook = new Webhook(this.discord_webhook);
+                    hook.setUsername(this.name);
+                    hook.send(`**${this.name}** (${this.registration}) landed on **${flight.arrival_airport}** at ${flight.arrival_time.toLocaleString()}`);
+                }
+                break;
+            case PlaneEvents.PLANE_TAKEOFF:
+                if (this.discord_webhook !== null) {
+                    const hook = new Webhook(this.discord_webhook);
+                    hook.setUsername(this.name);
+                    hook.send(`**${this.name}** (${this.registration}) takeoff from **${flight.departure_airport}** at ${flight.departure_time.toLocaleString()} with the callsign **${flight.callsign}**, squawk **${flight.squawk}**`);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
-    private findNearestAirport(){
-        if(this.last_lng === null || this.last_lat === null || PlaneAlert.airports === null){
+    private findNearestAirport() {
+        if (this.last_lng === null || this.last_lat === null || PlaneAlert.airports === null) {
             return null;
         }
-        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) searching for nearest airport of ${this.last_lat/1E6}/${this.last_lng/1E6}`);
+        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) searching for nearest airport of ${this.last_lat / 1E6}/${this.last_lng / 1E6}`);
         let min_distance = Number.MAX_SAFE_INTEGER;
         let nearest_airport = null;
         const allowedAirportsArray = this.allowed_airports.split(",");
@@ -138,7 +182,7 @@ export class Plane extends BaseEntity{
             if (airport.type === 'closed') {
                 continue;
             }
-            if (allowedAirportsArray.indexOf(airport.ident) === -1) {
+            if (allowedAirportsArray.indexOf(airport.type) === -1) {
                 continue;
             }
             const distance = GeoUtils.distanceBetweenCoordinates(this.last_lat / 1E6, this.last_lng / 1E6, airport.latitude_deg, airport.longitude_deg);
