@@ -73,7 +73,7 @@ class PlaneAlertMain {
             case TrackSource.FLIGHT_RADAR_24    :
                 this.log.info("Track source: FlighRadar 24");
                 const FlightRadar24Source = require('./tracksources/flight-radar-24/FlightRadar24Source');
-                this.trackSource = new FlightRadar24Source();
+                this.trackSource = new FlightRadar24Source.FlightRadar24Source();
                 break;
         }
     }
