@@ -27,6 +27,7 @@ class PlaneAlertMain {
                 dsn: this.config['sentryDSN'],
                 tracesSampleRate: 1.0,
             });
+            this.log.info("Sentry enabled");
         }
         const csvToJson = require('convert-csv-to-json');
         //check if file exists
