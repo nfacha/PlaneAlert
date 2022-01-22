@@ -7,5 +7,6 @@
   "databaseHost": "postgres",
   "databaseName": "planealert",
   "databaseUsername": "postgres",
-  "databasePassword": "123456789"
+  "databasePassword": "123456789",
+  "sentryDSN": ""
 }

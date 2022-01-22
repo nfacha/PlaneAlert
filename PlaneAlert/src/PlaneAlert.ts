@@ -6,7 +6,7 @@ import {TrackSource} from "./enum/TrackSource";
 import {OpenSkySource} from "./tracksources/OpenSkySource";
 import axios from "axios";
 import {Flight} from "./entities/Flight";
-
+import * as Sentry from '@sentry/node';
 
 class PlaneAlertMain {
     public log: Logger;
@@ -22,6 +22,12 @@ class PlaneAlertMain {
         this.log = new Logger();
         this.log.info("PlaneAlert started");
         this.config = this.loadConfig();
+        if (this.config['sentryDSN'] !== '') {
+            Sentry.init({
+                dsn: this.config['sentryDSN'],
+                tracesSampleRate: 1.0,
+            });
+        }
         const csvToJson = require('convert-csv-to-json');
         //check if file exists
         axios({
