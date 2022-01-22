@@ -2,4 +2,4 @@
 	path = PlaneAlertAPI
 	url = https://github.com/nfacha/PlaneAlert.git
 [submodule "PlaneAlert/src/tracksources/flight-radar-24"]
-	url = ssh://git@github.com:nfacha/PlaneAlert-FR24Module.git
+	url = git@github.com:nfacha/PlaneAlert-FR24Module.git
