@@ -3,7 +3,7 @@ import {createConnection, LessThan} from "typeorm";
 import {Plane} from "./entities/Plane";
 import * as fs from "fs";
 import {TrackSource} from "./enum/TrackSource";
-import {OpenSkySource} from "./tracksources/OpenSkySource";
+import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
 import axios from "axios";
 import {Flight} from "./entities/Flight";
 import * as Sentry from '@sentry/node';
