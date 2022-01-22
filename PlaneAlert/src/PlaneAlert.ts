@@ -7,7 +7,6 @@ import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
 import axios from "axios";
 import {Flight} from "./entities/Flight";
 import * as Sentry from '@sentry/node';
-import {FlightRadar24Source} from "./tracksources/FlightRadar24Source";
 
 class PlaneAlertMain {
     public log: Logger;
@@ -73,6 +72,7 @@ class PlaneAlertMain {
                 break;
             case TrackSource.FLIGHT_RADAR_24    :
                 this.log.info("Track source: FlighRadar 24");
+                const FlightRadar24Source = require('./tracksources/flight-radar-24/FlightRadar24Source');
                 this.trackSource = new FlightRadar24Source();
                 break;
         }
