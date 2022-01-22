@@ -7,12 +7,13 @@ import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
 import axios from "axios";
 import {Flight} from "./entities/Flight";
 import * as Sentry from '@sentry/node';
+import {FlightRadar24Source} from "./tracksources/FlightRadar24Source";
 
 class PlaneAlertMain {
     public log: Logger;
     public db: any;
     public config: any;
-    public trackSource: OpenSkySource | undefined;
+    public trackSource: OpenSkySource | any | undefined;
     public airports: any = [];
     public regions: any = [];
     public countries: any = [];
@@ -69,6 +70,11 @@ class PlaneAlertMain {
             case TrackSource.OPEN_SKY_NETWORK:
                 this.log.info("Track source: OpenSky Network");
                 this.trackSource = new OpenSkySource();
+                break;
+            case TrackSource.FLIGHT_RADAR_24    :
+                this.log.info("Track source: FlighRadar 24");
+                this.trackSource = new FlightRadar24Source();
+                break;
         }
     }
 
