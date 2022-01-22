@@ -1,3 +1,5 @@
 [submodule "PlaneAlertAPI"]
 	path = PlaneAlertAPI
 	url = git@github.com:nfacha/PlaneAlert-FR24Module.git
+[submodule "PlaneAlert/src/tracksources/flight-radar-24"]
+	url = git@github.com:nfacha/PlaneAlert-FR24Module.git
