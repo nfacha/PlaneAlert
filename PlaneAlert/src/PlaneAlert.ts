@@ -12,7 +12,7 @@ class PlaneAlertMain {
     public log: Logger;
     public db: any;
     public config: any;
-    public trackSource: OpenSkySource | undefined;
+    public trackSource: OpenSkySource | any | undefined;
     public airports: any = [];
     public regions: any = [];
     public countries: any = [];
@@ -69,6 +69,12 @@ class PlaneAlertMain {
             case TrackSource.OPEN_SKY_NETWORK:
                 this.log.info("Track source: OpenSky Network");
                 this.trackSource = new OpenSkySource();
+                break;
+            case TrackSource.FLIGHT_RADAR_24    :
+                this.log.info("Track source: FlighRadar 24");
+                const FlightRadar24Source = require('./tracksources/flight-radar-24/FlightRadar24Source');
+                this.trackSource = new FlightRadar24Source();
+                break;
         }
     }
 

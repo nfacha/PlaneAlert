@@ -1,5 +1,5 @@
 export interface PlaneTrackResponse{
-    icao24: string;
+    icao24: string|null;
     callsign: string|null;
     longitude: number|null;
     latitude: number|null;

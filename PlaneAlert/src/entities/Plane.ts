@@ -5,6 +5,7 @@ import {GeoUtils} from "../utils/GeoUtils";
 import {Flight} from "./Flight";
 import {Webhook} from "discord-webhook-node";
 import axios from "axios";
+import {TrackSource} from "../enum/TrackSource";
 
 @Entity()
 export class Plane extends BaseEntity{
@@ -60,7 +61,11 @@ export class Plane extends BaseEntity{
     ////////////////////////////////////////////////////////////////
 
     public async update() {
-        const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
+        let planeQuery = this.icao;
+        if(PlaneAlert.config['trackSource'] === TrackSource.FLIGHT_RADAR_24){
+            planeQuery = this.registration;
+        }
+        const data = await PlaneAlert.trackSource?.getPlaneStatus(planeQuery);
         if (data === undefined) {
             return;
         }
