@@ -132,23 +132,25 @@ export class Plane extends BaseEntity{
                 lostTime.setMinutes(lostTime.getMinutes() + PlaneAlert.config['landingSignalLostThreshold']);
                 if (lostTime < new Date()) {
                     PlaneAlert.log.info(`Plane ${this.icao} is lost`);
-                    const nearestAirport = this.findNearestAirport();
-                    let flight = await Flight.findOne({
-                        where: {plane_id: this.id, arrival_time: Not(IsNull())},
-                        order: {id: 'DESC'}
-                    });
-                    if (flight === undefined) {
-                        flight = new Flight();
-                        flight.plane_id = this.id;
+                    if (this.last_altitude !== null && this.last_altitude < PlaneAlert.config['landingAltitudeThreshold']) {
+                        const nearestAirport = this.findNearestAirport();
+                        let flight = await Flight.findOne({
+                            where: {plane_id: this.id, arrival_time: Not(IsNull())},
+                            order: {id: 'DESC'}
+                        });
+                        if (flight === undefined) {
+                            flight = new Flight();
+                            flight.plane_id = this.id;
+                        }
+                        flight.arrival_time = new Date();
+                        if (nearestAirport?.airport !== null) {
+                            PlaneAlert.log.info(`Plane ${this.icao} is landing on ${nearestAirport?.airport.name}`);
+                            flight.arrival_airport = nearestAirport?.airport.ident;
+                        }
+                        this.on_ground = true;
+                        await flight.save();
+                        this.triggerEvent(PlaneEvents.PLANE_LAND, flight);
                     }
-                    flight.arrival_time = new Date();
-                    if (nearestAirport?.airport !== null) {
-                        PlaneAlert.log.info(`Plane ${this.icao} is landing on ${nearestAirport?.airport.name}`);
-                        flight.arrival_airport = nearestAirport?.airport.ident;
-                    }
-                    this.on_ground = true;
-                    await flight.save();
-                    this.triggerEvent(PlaneEvents.PLANE_LAND, flight);
                 }
             }
             this.live_track = false;
