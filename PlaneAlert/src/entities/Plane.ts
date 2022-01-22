@@ -51,6 +51,9 @@ export class Plane extends BaseEntity{
     @Column({type: "integer", nullable: true})
     last_lng!: number | null;
 
+    @Column({type: "integer", nullable: true})
+    last_altitude!: number | null;
+
     @Column({type: "text", nullable: true})
     discord_webhook!: string;
 
@@ -68,6 +71,11 @@ export class Plane extends BaseEntity{
             } else {
                 this.last_lat = null;
                 this.last_lng = null;
+            }
+            if (data.barometricAltitude !== null) {
+                this.last_altitude = Math.round(data.barometricAltitude);
+            } else {
+                this.last_altitude = null;
             }
             if (!data.onGround
                 && data.barometricAltitude !== null && data.barometricAltitude < PlaneAlert.config['takeoffAltitudeThreshold']
