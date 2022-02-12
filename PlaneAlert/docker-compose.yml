@@ -35,7 +35,7 @@ services:
       - ./:/app
     depends_on:
       - postgres
-    restart: unless-stopped
+    restart: always
 
   api:
     build:
