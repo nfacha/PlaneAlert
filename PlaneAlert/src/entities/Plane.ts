@@ -198,8 +198,8 @@ export class Plane extends BaseEntity {
                 }
                 break;
             case PlaneEvents.PLANE_TAKEOFF:
-                PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  TAKE OFF, discord bridges: ${this.discordAccountAssignments.length}`);
                 for (const discordAssignment of this.discordAccountAssignments) {
+                    PlaneAlert.log.info(JSON.stringify(discordAssignment));
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered LANDING for Discord ${discordAssignment.discordAccount.name}`);
                     const hook = new Webhook(discordAssignment.discordAccount.webhook);
                     hook.setUsername(this.name);
