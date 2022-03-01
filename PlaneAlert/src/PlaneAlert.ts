@@ -141,17 +141,19 @@ class PlaneAlertMain {
                 if (plane.icao === "" || plane.icao === null) {
                     this.log.warn("Plane " + plane.name + " has no ICAO");
                     if (this.config['aeroDataBoxAPIKey'] !== "") {
-                        let rx = await axios.get('https://aerodatabox.p.rapidapi.com/aircrafts/reg/' + plane.registration, {
-                            headers: {
-                                "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
-                                "x-rapidapi-key": this.config['aeroDataBoxAPIKey'],
+                        try {
+                            let rx = await axios.get('https://aerodatabox.p.rapidapi.com/aircrafts/reg/' + plane.registration, {
+                                headers: {
+                                    "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
+                                    "x-rapidapi-key": this.config['aeroDataBoxAPIKey'],
+                                }
+                            });
+                            if (rx.status === 200) {
+                                plane.icao = rx.data.hexIcao;
+                                this.log.info("Found ICAO: " + plane.icao + " for " + plane.name);
+                                await plane.save();
                             }
-                        });
-                        if (rx.status === 200) {
-                            plane.icao = rx.data.hexIcao;
-                            this.log.info("Found ICAO: " + plane.icao + " for " + plane.name);
-                            await plane.save();
-                        } else {
+                        } catch (e) {
                             plane.active = false;
                             await plane.save();
                         }
@@ -162,17 +164,19 @@ class PlaneAlertMain {
                 if (plane.registration === "" || plane.registration === null) {
                     this.log.warn("Plane " + plane.name + " has no registration");
                     if (this.config['aeroDataBoxAPIKey'] !== "") {
-                        let rx = await axios.get('https://aerodatabox.p.rapidapi.com/aircrafts/icao24/' + plane.icao, {
-                            headers: {
-                                "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
-                                "x-rapidapi-key": this.config['aeroDataBoxAPIKey'],
+                        try {
+                            let rx = await axios.get('https://aerodatabox.p.rapidapi.com/aircrafts/icao24/' + plane.icao, {
+                                headers: {
+                                    "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
+                                    "x-rapidapi-key": this.config['aeroDataBoxAPIKey'],
+                                }
+                            });
+                            if (rx.status === 200) {
+                                plane.registration = rx.data.reg;
+                                this.log.info("Found REG: " + plane.registration + " for " + plane.name);
+                                await plane.save();
                             }
-                        });
-                        if (rx.status === 200) {
-                            plane.registration = rx.data.reg;
-                            this.log.info("Found REG: " + plane.registration + " for " + plane.name);
-                            await plane.save();
-                        } else {
+                        } catch (e) {
                             plane.active = false;
                             await plane.save();
                         }
