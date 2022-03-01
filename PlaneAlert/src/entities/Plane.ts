@@ -57,13 +57,13 @@ export class Plane extends BaseEntity {
     @Column({type: "integer", nullable: true})
     last_altitude!: number | null;
 
-    @OneToMany(() => TwitterAssignment, account => account.plane_id)
+    @OneToMany(() => TwitterAssignment, account => account.plane)
         // @ts-ignore
-    twitterAccountAssignment: TwitterAssignment[];
+    twitterAccountAssignments: TwitterAssignment[];
 
-    @OneToMany(() => DiscordAssignment, account => account.plane_id)
+    @OneToMany(() => DiscordAssignment, account => account.plane)
         // @ts-ignore
-    discordAccountAssignment: DiscordAssignment[];
+    discordAccountAssignments: DiscordAssignment[];
 
     ////////////////////////////////////////////////////////////////
 
@@ -184,7 +184,7 @@ export class Plane extends BaseEntity {
         }
         switch (event) {
             case PlaneEvents.PLANE_LAND:
-                for (const discordAssignment of this.discordAccountAssignment) {
+                for (const discordAssignment of this.discordAccountAssignments) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  LAND for Discord ${discordAssignment.discordAccount.name}`);
                     const hook = new Webhook(discordAssignment.discordAccount.webhook);
                     hook.setUsername(this.name);
@@ -193,14 +193,14 @@ export class Plane extends BaseEntity {
                     }
                     hook.send(`**${this.name}** (${this.registration}) landed on **${flight.arrival_airport}** at ${flight.arrival_time.toLocaleString()}`);
                 }
-                for (const twitterAssignment of this.twitterAccountAssignment) {
+                for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
                         text: `${this.name} (${this.registration}) landed on ${flight.arrival_airport} at ${flight.arrival_time.toLocaleString()}`,
                     })
                 }
                 break;
             case PlaneEvents.PLANE_TAKEOFF:
-                for (const discordAssignment of this.discordAccountAssignment) {
+                for (const discordAssignment of this.discordAccountAssignments) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered LANDING for Discord ${discordAssignment.discordAccount.name}`);
                     const hook = new Webhook(discordAssignment.discordAccount.webhook);
                     hook.setUsername(this.name);
@@ -209,7 +209,7 @@ export class Plane extends BaseEntity {
                     }
                     hook.send(`**${this.name}** (${this.registration}) takeoff from **${flight.departure_airport}** at ${flight.departure_time.toLocaleString()} with the callsign **${flight.callsign}**, squawk **${flight.squawk}**`);
                 }
-                for (const twitterAssignment of this.twitterAccountAssignment) {
+                for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
                         text: `${this.name} (${this.registration}) takeoff from ${flight.departure_airport} at ${flight.departure_time.toLocaleString()} with the callsign ${flight.callsign}, squawk ${flight.squawk}`,
                     })
