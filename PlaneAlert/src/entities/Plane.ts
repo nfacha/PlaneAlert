@@ -183,6 +183,7 @@ export class Plane extends BaseEntity {
         switch (event) {
             case PlaneEvents.PLANE_LAND:
                 for (const discordAssignment of this.discordAccountAssignment) {
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  LAND for Discord ${discordAssignment.discordAccount.name}`);
                     const hook = new Webhook(discordAssignment.discordAccount.webhook);
                     hook.setUsername(this.name);
                     if (photoUrl !== null) {
@@ -198,6 +199,7 @@ export class Plane extends BaseEntity {
                 break;
             case PlaneEvents.PLANE_TAKEOFF:
                 for (const discordAssignment of this.discordAccountAssignment) {
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered LANDING for Discord ${discordAssignment.discordAccount.name}`);
                     const hook = new Webhook(discordAssignment.discordAccount.webhook);
                     hook.setUsername(this.name);
                     if (photoUrl !== null) {
