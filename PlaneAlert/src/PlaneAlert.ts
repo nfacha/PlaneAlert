@@ -151,6 +151,9 @@ class PlaneAlertMain {
                             plane.icao = rx.data.hexIcao;
                             this.log.info("Found ICAO: " + plane.icao + " for " + plane.name);
                             await plane.save();
+                        } else {
+                            plane.active = false;
+                            await plane.save();
                         }
 
                     }
@@ -168,6 +171,9 @@ class PlaneAlertMain {
                         if (rx.status === 200) {
                             plane.registration = rx.data.reg;
                             this.log.info("Found REG: " + plane.registration + " for " + plane.name);
+                            await plane.save();
+                        } else {
+                            plane.active = false;
                             await plane.save();
                         }
 
