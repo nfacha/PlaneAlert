@@ -7,6 +7,7 @@ import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
 import axios from "axios";
 import {Flight} from "./entities/Flight";
 import * as Sentry from '@sentry/node';
+import {TwitterAccount} from "./entities/TwitterAccount";
 
 class PlaneAlertMain {
     public log: Logger;
@@ -90,6 +91,7 @@ class PlaneAlertMain {
                 entities: [
                     Plane,
                     Flight,
+                    TwitterAccount,
                 ],
                 logging: false,
                 synchronize: true,
