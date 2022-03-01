@@ -57,13 +57,11 @@ export class Plane extends BaseEntity {
     @Column({type: "integer", nullable: true})
     last_altitude!: number | null;
 
-    @OneToMany(() => TwitterAssignment, account => account.plane, {eager: true})
-        // @ts-ignore
-    twitterAccountAssignments: TwitterAssignment[];
+    @OneToMany(() => TwitterAssignment, account => account.plane)
+    twitterAccountAssignments!: TwitterAssignment[];
 
-    @OneToMany(() => DiscordAssignment, account => account.plane, {eager: true})
-        // @ts-ignore
-    discordAccountAssignments: DiscordAssignment[];
+    @OneToMany(() => DiscordAssignment, account => account.plane)
+    discordAccountAssignments!: DiscordAssignment[];
 
     ////////////////////////////////////////////////////////////////
 

@@ -134,7 +134,8 @@ class PlaneAlertMain {
                         active: true,
                         next_refresh: null,
                     }
-                ]
+                ],
+                relations: ["twitterAccountAssignments", "discordAccountAssignments"],
             });
             for (const plane of planes) {
                 this.log.info("Updating plane: " + plane.icao);
