@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, JoinColumn, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Plane} from "./Plane";
 import {DiscordWebhook} from "./DiscordWebhook";
 
@@ -11,8 +11,10 @@ export class DiscordAssignment extends BaseEntity {
     plane_id!: number;
     @Column({type: "integer"})
     discord_account_id!: number;
-    @JoinColumn({name: 'plane_id'})
-    plane!: Plane;
+    // @JoinColumn({name: 'plane_id'})
+    // plane!: Plane;
     @JoinColumn({name: 'discord_account_id'})
     discordAccount!: DiscordWebhook;
+    @ManyToOne(() => Plane, plane => plane.discordAccountAssignment)
+    plane!: Plane;
 }

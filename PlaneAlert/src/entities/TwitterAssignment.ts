@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, JoinColumn, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 import {Plane} from "./Plane";
 import {TwitterAccount} from "./TwitterAccount";
 
@@ -11,8 +11,10 @@ export class TwitterAssignment extends BaseEntity {
     plane_id!: number;
     @Column({type: "integer"})
     twitter_account_id!: number;
-    @JoinColumn({name: 'plane_id'})
-    plane!: Plane;
+    // @JoinColumn({name: 'plane_id'})
+    // plane!: Plane;
     @JoinColumn({name: 'twitter_account_id'})
     twitterAccount!: TwitterAccount;
+    @ManyToOne(() => Plane, plane => plane.twitterAccountAssignment)
+    plane!: Plane;
 }
