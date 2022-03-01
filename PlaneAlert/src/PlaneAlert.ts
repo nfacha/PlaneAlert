@@ -67,9 +67,9 @@ class PlaneAlertMain {
                     for (const twitterAccount of twitterAccounts) {
                         this.twitterAccounts.push(twitterAccount);
                         this.log.info("loaded  Twitter Account: " + twitterAccount.username);
-                        twitterAccount.getClient().v2.tweet({
-                            text: "Testing Twitter API",
-                        })
+                        // twitterAccount.getClient().v2.tweet({
+                        //     text: "Testing Twitter API",
+                        // })
                     }
                 });
                 await this.updatePlaneData();
