@@ -8,6 +8,9 @@ import axios from "axios";
 import {Flight} from "./entities/Flight";
 import * as Sentry from '@sentry/node';
 import {TwitterAccount} from "./entities/TwitterAccount";
+import {DiscordWebhook} from "./entities/DiscordWebhook";
+import {DiscordAssignment} from "./entities/DiscordAssignment";
+import {TwitterAssignment} from "./entities/TwitterAssignment";
 
 class PlaneAlertMain {
     public log: Logger;
@@ -102,6 +105,9 @@ class PlaneAlertMain {
                     Plane,
                     Flight,
                     TwitterAccount,
+                    DiscordWebhook,
+                    DiscordAssignment,
+                    TwitterAssignment,
                 ],
                 logging: false,
                 synchronize: true,

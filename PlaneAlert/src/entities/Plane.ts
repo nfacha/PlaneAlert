@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, IsNull, Not, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, IsNull, Not, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {PlaneAlert} from "../PlaneAlert";
 import {PlaneEvents} from "../PlaneEvents";
 import {GeoUtils} from "../utils/GeoUtils";
@@ -6,9 +6,11 @@ import {Flight} from "./Flight";
 import {Webhook} from "discord-webhook-node";
 import axios from "axios";
 import {TrackSource} from "../enum/TrackSource";
+import {TwitterAssignment} from "./TwitterAssignment";
+import {DiscordAssignment} from "./DiscordAssignment";
 
 @Entity()
-export class Plane extends BaseEntity{
+export class Plane extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id!: number;
@@ -55,14 +57,19 @@ export class Plane extends BaseEntity{
     @Column({type: "integer", nullable: true})
     last_altitude!: number | null;
 
-    @Column({type: "text", nullable: true})
-    discord_webhook!: string;
+    @OneToMany(() => TwitterAssignment, account => account.plane_id)
+        // @ts-ignore
+    twitterAccountAssignment: TwitterAssignment[];
+
+    @OneToMany(() => DiscordAssignment, account => account.plane_id)
+        // @ts-ignore
+    discordAccountAssignment: DiscordAssignment[];
 
     ////////////////////////////////////////////////////////////////
 
     public async update() {
         let planeQuery = this.icao;
-        if(PlaneAlert.config['trackSource'] === TrackSource.FLIGHT_RADAR_24){
+        if (PlaneAlert.config['trackSource'] === TrackSource.FLIGHT_RADAR_24) {
             planeQuery = this.registration;
         }
         const data = await PlaneAlert.trackSource?.getPlaneStatus(planeQuery);
@@ -175,23 +182,33 @@ export class Plane extends BaseEntity{
         }
         switch (event) {
             case PlaneEvents.PLANE_LAND:
-                if (this.discord_webhook !== null) {
-                    const hook = new Webhook(this.discord_webhook);
+                for (const discordAssignment of this.discordAccountAssignment) {
+                    const hook = new Webhook(discordAssignment.discordAccount.webhook);
                     hook.setUsername(this.name);
                     if (photoUrl !== null) {
                         hook.setAvatar(photoUrl);
                     }
                     hook.send(`**${this.name}** (${this.registration}) landed on **${flight.arrival_airport}** at ${flight.arrival_time.toLocaleString()}`);
                 }
+                for (const twitterAssignment of this.twitterAccountAssignment) {
+                    await twitterAssignment.twitterAccount.getClient().v2.tweet({
+                        text: `${this.name} (${this.registration}) landed on ${flight.arrival_airport} at ${flight.arrival_time.toLocaleString()}`,
+                    })
+                }
                 break;
             case PlaneEvents.PLANE_TAKEOFF:
-                if (this.discord_webhook !== null) {
-                    const hook = new Webhook(this.discord_webhook);
+                for (const discordAssignment of this.discordAccountAssignment) {
+                    const hook = new Webhook(discordAssignment.discordAccount.webhook);
                     hook.setUsername(this.name);
                     if (photoUrl !== null) {
                         hook.setAvatar(photoUrl);
                     }
                     hook.send(`**${this.name}** (${this.registration}) takeoff from **${flight.departure_airport}** at ${flight.departure_time.toLocaleString()} with the callsign **${flight.callsign}**, squawk **${flight.squawk}**`);
+                }
+                for (const twitterAssignment of this.twitterAccountAssignment) {
+                    await twitterAssignment.twitterAccount.getClient().v2.tweet({
+                        text: `${this.name} (${this.registration}) takeoff from ${flight.departure_airport} at ${flight.departure_time.toLocaleString()} with the callsign ${flight.callsign}, squawk ${flight.squawk}`,
+                    })
                 }
                 break;
             default:
