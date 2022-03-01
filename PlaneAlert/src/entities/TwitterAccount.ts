@@ -1,6 +1,7 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {TwitterApi} from "twitter-api-v2";
 import {PlaneAlert} from "../PlaneAlert";
+import {TwitterAssignment} from "./TwitterAssignment";
 
 @Entity()
 export class TwitterAccount extends BaseEntity {
@@ -15,6 +16,9 @@ export class TwitterAccount extends BaseEntity {
     access_token!: string;
     @Column({type: "varchar", length: 255})
     access_secret!: string;
+
+    @OneToMany(() => TwitterAssignment, account => account.twitterAccount)
+    assignments!: TwitterAssignment[];
 
     public getClient() {
         return new TwitterApi(

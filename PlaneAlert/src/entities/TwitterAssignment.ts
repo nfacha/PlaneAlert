@@ -11,9 +11,8 @@ export class TwitterAssignment extends BaseEntity {
     plane_id!: number;
     @Column({type: "integer"})
     twitter_account_id!: number;
-    // @JoinColumn({name: 'plane_id'})
-    // plane!: Plane;
-    @JoinColumn({name: 'twitter_account_id'})
+    @ManyToOne(() => TwitterAccount, twitter => twitter.assignments, {eager: true})
+    @JoinColumn({name: "twitter_account_id"})
     twitterAccount!: TwitterAccount;
     @ManyToOne(() => Plane, plane => plane.twitterAccountAssignments)
     @JoinColumn({name: "plane_id"})

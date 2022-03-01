@@ -11,8 +11,6 @@ export class DiscordAssignment extends BaseEntity {
     plane_id!: number;
     @Column({type: "integer"})
     discord_account_id!: number;
-    // @JoinColumn({name: 'plane_id'})
-    // plane!: Plane;
     @ManyToOne(() => DiscordWebhook, discord => discord.assignments, {eager: true})
     @JoinColumn({name: "discord_account_id"})
     discordAccount!: DiscordWebhook;
