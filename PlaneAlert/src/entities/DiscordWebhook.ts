@@ -1,4 +1,5 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {DiscordAssignment} from "./DiscordAssignment";
 
 @Entity()
 export class DiscordWebhook extends BaseEntity {
@@ -9,5 +10,9 @@ export class DiscordWebhook extends BaseEntity {
     name!: string;
     @Column({type: "text", nullable: true})
     webhook!: string;
+
+    @OneToMany(() => DiscordAssignment, account => account.discordAccount)
+    assignments!: DiscordAssignment[];
+
 
 }
