@@ -8,5 +8,7 @@
   "databaseName": "planealert",
   "databaseUsername": "postgres",
   "databasePassword": "123456789",
-  "sentryDSN": ""
+  "sentryDSN": "",
+  "twitterAppToken": "",
+  "twitterAppSecret": "",
 }

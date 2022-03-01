@@ -7,6 +7,7 @@ import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
 import axios from "axios";
 import {Flight} from "./entities/Flight";
 import * as Sentry from '@sentry/node';
+import {TwitterAccount} from "./entities/TwitterAccount";
 
 class PlaneAlertMain {
     public log: Logger;
@@ -16,6 +17,7 @@ class PlaneAlertMain {
     public airports: any = [];
     public regions: any = [];
     public countries: any = [];
+    public twitterAccounts: TwitterAccount[] = [];
 
 
     constructor() {
@@ -61,6 +63,15 @@ class PlaneAlertMain {
         this.initDatabase().then(async () => {
             if (this.db.isConnected) {
                 this.log.info("Database initialized");
+                TwitterAccount.find().then(async (twitterAccounts) => {
+                    for (const twitterAccount of twitterAccounts) {
+                        this.twitterAccounts.push(twitterAccount);
+                        this.log.info("loaded  Twitter Account: " + twitterAccount.username);
+                        // twitterAccount.getClient().v2.tweet({
+                        //     text: "Testing Twitter API",
+                        // })
+                    }
+                });
                 await this.updatePlaneData();
                 //
             }
@@ -90,6 +101,7 @@ class PlaneAlertMain {
                 entities: [
                     Plane,
                     Flight,
+                    TwitterAccount,
                 ],
                 logging: false,
                 synchronize: true,
