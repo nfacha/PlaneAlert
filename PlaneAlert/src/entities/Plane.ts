@@ -176,9 +176,11 @@ export class Plane extends BaseEntity {
     private async triggerEvent(event: PlaneEvents, flight: Flight) {
         PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
         let photoUrl = null;
-        const photoData = await axios.get('https://api.planespotters.net/pub/photos/hex/' + this.icao);
-        if (photoData.status === 200 && photoData.data.photos.length > 0) {
-            photoUrl = photoData.data.photos[0].thumbnail_large.src
+        if (this.icao !== null) {
+            const photoData = await axios.get('https://api.planespotters.net/pub/photos/hex/' + this.icao);
+            if (photoData.status === 200 && photoData.data.photos.length > 0) {
+                photoUrl = photoData.data.photos[0].thumbnail_large.src
+            }
         }
         switch (event) {
             case PlaneEvents.PLANE_LAND:
