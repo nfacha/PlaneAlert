@@ -18,10 +18,10 @@ export class Plane extends BaseEntity {
     @Column({type: "varchar", length: 255})
     name!: string;
 
-    @Column({type: "varchar", length: 255})
+    @Column({type: "varchar", length: 255, nullable: true})
     icao!: string;
 
-    @Column({type: "varchar", length: 255})
+    @Column({type: "varchar", length: 255, nullable: true})
     registration!: string;
 
     @Column({type: "boolean", default: true})

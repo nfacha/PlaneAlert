@@ -11,4 +11,5 @@
   "sentryDSN": "",
   "twitterAppToken": "",
   "twitterAppSecret": "",
+  "aeroDataBoxAPIKey": "",
 }
