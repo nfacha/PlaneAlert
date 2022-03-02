@@ -192,7 +192,7 @@ export class Plane extends BaseEntity {
                 }
                 for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
-                        text: `${this.name} (${this.registration}) landed on ${flight.arrival_airport} at ${flight.arrival_time.toLocaleString()}`,
+                        text: `${this.name} (#${this.registration}) landed on #${flight.arrival_airport} at ${flight.arrival_time.toLocaleString()}`,
                     })
                 }
                 break;
@@ -207,7 +207,7 @@ export class Plane extends BaseEntity {
                 }
                 for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
-                        text: `${this.name} (${this.registration}) takeoff from ${flight.departure_airport} at ${flight.departure_time.toLocaleString()} with the callsign ${flight.callsign}, squawk ${flight.squawk}`,
+                        text: `${this.name} (#${this.registration}) takeoff from #${flight.departure_airport} at ${flight.departure_time.toLocaleString()} with the callsign #${flight.callsign}, squawk ${flight.squawk}`,
                     })
                 }
                 break;
