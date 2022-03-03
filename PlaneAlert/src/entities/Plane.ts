@@ -180,6 +180,7 @@ export class Plane extends BaseEntity {
                 photoUrl = photoData.data.photos[0].thumbnail_large.src
             }
         }
+        let adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + this.icao;
         switch (event) {
             case PlaneEvents.PLANE_LAND:
                 for (const discordAssignment of this.discordAccountAssignments) {
@@ -188,11 +189,11 @@ export class Plane extends BaseEntity {
                     if (photoUrl !== null) {
                         hook.setAvatar(photoUrl);
                     }
-                    hook.send(`**${this.name}** (${this.registration}) landed on **${flight.arrival_airport}** at ${flight.arrival_time.toLocaleString()}`);
+                    hook.send(`**${this.name}** (${this.registration}) landed on **${flight.arrival_airport}** at ${flight.arrival_time.toLocaleString()}\n${adsbExchangeLink}`);
                 }
                 for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
-                        text: `${this.name} (#${this.registration}) landed on #${flight.arrival_airport} at ${flight.arrival_time.toLocaleString()}`,
+                        text: `${this.name} (#${this.registration}) landed on #${flight.arrival_airport} at ${flight.arrival_time.toLocaleString()}\n${adsbExchangeLink}`,
                     })
                 }
                 break;
@@ -203,11 +204,11 @@ export class Plane extends BaseEntity {
                     if (photoUrl !== null) {
                         hook.setAvatar(photoUrl);
                     }
-                    hook.send(`**${this.name}** (${this.registration}) takeoff from **${flight.departure_airport}** at ${flight.departure_time.toLocaleString()} with the callsign **${flight.callsign}**, squawk **${flight.squawk}**`);
+                    hook.send(`**${this.name}** (${this.registration}) takeoff from **${flight.departure_airport}** at ${flight.departure_time.toLocaleString()} with the callsign **${flight.callsign}**, squawk **${flight.squawk}**\n${adsbExchangeLink}`);
                 }
                 for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
-                        text: `${this.name} (#${this.registration}) takeoff from #${flight.departure_airport} at ${flight.departure_time.toLocaleString()} with the callsign #${flight.callsign}, squawk ${flight.squawk}`,
+                        text: `${this.name} (#${this.registration}) takeoff from #${flight.departure_airport} at ${flight.departure_time.toLocaleString()} with the callsign #${flight.callsign}, squawk ${flight.squawk}\n${adsbExchangeLink}`,
                     })
                 }
                 break;
