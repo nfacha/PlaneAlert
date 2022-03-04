@@ -104,7 +104,7 @@ export class Plane extends BaseEntity {
                     PlaneAlert.log.info(`Plane ${this.icao} is taking off`);
                 }
                 flight.save();
-                this.triggerEvent(PlaneEvents.PLANE_TAKEOFF, flight);
+                this.triggerEvent(PlaneEvents.PLANE_TAKEOFF, flight, {nearestAirport: nearestAirport?.airport});
             }
             if (data.onGround
                 && data.barometricAltitude !== null
@@ -131,7 +131,7 @@ export class Plane extends BaseEntity {
                     PlaneAlert.log.info(`Plane ${this.icao} is landing`);
                 }
                 await flight.save();
-                this.triggerEvent(PlaneEvents.PLANE_LAND, flight);
+                this.triggerEvent(PlaneEvents.PLANE_LAND, flight, {nearestAirport: nearestAirport?.airport});
             }
             this.on_ground = data.onGround;
             this.live_track = true;
@@ -160,7 +160,7 @@ export class Plane extends BaseEntity {
                         }
                         this.on_ground = true;
                         await flight.save();
-                        this.triggerEvent(PlaneEvents.PLANE_LAND, flight);
+                        this.triggerEvent(PlaneEvents.PLANE_LAND, flight, {nearestAirport: nearestAirport?.airport});
                     }
                 }
             }
@@ -172,7 +172,7 @@ export class Plane extends BaseEntity {
         this.save();
     }
 
-    private async triggerEvent(event: PlaneEvents, flight: Flight) {
+    private async triggerEvent(event: PlaneEvents, flight: Flight, data: any = null) {
         PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
         let photoUrl = null;
         if (this.icao !== null) {
@@ -190,11 +190,11 @@ export class Plane extends BaseEntity {
                     if (photoUrl !== null) {
                         hook.setAvatar(photoUrl);
                     }
-                    hook.send(`**${this.name}** (${this.registration}) landed on **${flight.arrival_airport}** at ${flight.arrival_time.toLocaleString()}\n${adsbExchangeLink}`);
+                    hook.send(`**${this.name}** (${this.registration}) landed on **${data.nearestAirport.name} (${flight.arrival_airport})** at ${flight.arrival_time.toLocaleString()}\n${adsbExchangeLink}`);
                 }
                 for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
-                        text: `${this.name} (#${this.registration}) landed on #${flight.arrival_airport} at ${flight.arrival_time.toLocaleString()}\n${adsbExchangeLink}`,
+                        text: `${this.name} (#${this.registration}) landed on ${data.nearestAirport.name} (#${flight.arrival_airport}) at ${flight.arrival_time.toLocaleString()}\n${adsbExchangeLink}`,
                     })
                 }
                 break;
@@ -205,11 +205,11 @@ export class Plane extends BaseEntity {
                     if (photoUrl !== null) {
                         hook.setAvatar(photoUrl);
                     }
-                    hook.send(`**${this.name}** (${this.registration}) takeoff from **${flight.departure_airport}** at ${flight.departure_time.toLocaleString()} with the callsign **${flight.callsign}**, squawk **${flight.squawk}**\n${adsbExchangeLink}`);
+                    hook.send(`**${this.name}** (${this.registration}) takeoff from **${data.nearestAirport.name} (${flight.departure_airport})** at ${flight.departure_time.toLocaleString()} as flight **${flight.callsign}**\n${adsbExchangeLink}`);
                 }
                 for (const twitterAssignment of this.twitterAccountAssignments) {
                     await twitterAssignment.twitterAccount.getClient().v2.tweet({
-                        text: `${this.name} (#${this.registration}) takeoff from #${flight.departure_airport} at ${flight.departure_time.toLocaleString()} with the callsign #${flight.callsign}, squawk ${flight.squawk}\n${adsbExchangeLink}`,
+                        text: `${this.name} (#${this.registration}) takeoff from ${data.nearestAirport.name} (#${flight.departure_airport}) at ${flight.departure_time.toLocaleString()} as flight #${flight.callsign}\n${adsbExchangeLink}`,
                     })
                 }
                 break;
