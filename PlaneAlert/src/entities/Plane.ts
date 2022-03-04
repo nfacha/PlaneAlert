@@ -8,6 +8,7 @@ import axios from "axios";
 import {TrackSource} from "../enum/TrackSource";
 import {TwitterAssignment} from "./TwitterAssignment";
 import {DiscordAssignment} from "./DiscordAssignment";
+import {TrackHistory} from "./TrackHistory";
 
 @Entity()
 export class Plane extends BaseEntity {
@@ -74,18 +75,38 @@ export class Plane extends BaseEntity {
         if (data === undefined) {
             return;
         }
+        // PlaneAlert.log.info(data);
         if (data !== null) {
+            const history = new TrackHistory();
+            history.plane_id = this.id;
+            history.timestamp = new Date();
             if (data.latitude !== null && data.longitude !== null) {
                 this.last_lat = Math.round(data.latitude * 1E6);
                 this.last_lng = Math.round(data.longitude * 1E6);
+                history.latitude = data.latitude;
+                history.longitude = data.longitude;
             } else {
                 this.last_lat = null;
                 this.last_lng = null;
             }
             if (data.barometricAltitude !== null) {
                 this.last_altitude = Math.round(data.barometricAltitude);
+                history.barometricAltitude = this.last_altitude;
             } else {
                 this.last_altitude = null;
+            }
+            history.onGround = data.onGround;
+            if (data.callsign !== null) {
+                history.callsign = data.callsign;
+            }
+            if (data.velocity !== null) {
+                history.velocity = data.velocity;
+            }
+            if (data.verticalRate !== null) {
+                history.verticalRate = data.verticalRate;
+            }
+            if (data.squawk !== null) {
+                history.squawk = data.squawk;
             }
             if (!data.onGround
                 && data.barometricAltitude !== null && data.barometricAltitude < PlaneAlert.config['takeoffAltitudeThreshold']
@@ -136,6 +157,7 @@ export class Plane extends BaseEntity {
             this.on_ground = data.onGround;
             this.live_track = true;
             this.last_seen = new Date();
+            history.save();
         }else {
             if (!this.on_ground) {
                 const lostTime = new Date(this.last_seen.getTime());

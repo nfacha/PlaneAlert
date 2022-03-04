@@ -11,6 +11,7 @@ import {TwitterAccount} from "./entities/TwitterAccount";
 import {DiscordWebhook} from "./entities/DiscordWebhook";
 import {DiscordAssignment} from "./entities/DiscordAssignment";
 import {TwitterAssignment} from "./entities/TwitterAssignment";
+import {TrackHistory} from "./entities/TrackHistory";
 
 class PlaneAlertMain {
     public log: Logger;
@@ -108,6 +109,7 @@ class PlaneAlertMain {
                     DiscordWebhook,
                     DiscordAssignment,
                     TwitterAssignment,
+                    TrackHistory,
                 ],
                 logging: false,
                 synchronize: true,
