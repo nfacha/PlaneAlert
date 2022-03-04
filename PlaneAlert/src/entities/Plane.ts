@@ -1,4 +1,4 @@
-import {BaseEntity, Column, Entity, IsNull, Not, OneToMany, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, IsNull, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {PlaneAlert} from "../PlaneAlert";
 import {PlaneEvents} from "../PlaneEvents";
 import {GeoUtils} from "../utils/GeoUtils";
@@ -114,7 +114,7 @@ export class Plane extends BaseEntity {
                 //Plane landing
                 const nearestAirport = this.findNearestAirport();
                 let flight = await Flight.findOne({
-                    where: {plane_id: this.id, arrival_time: Not(IsNull())},
+                    where: {plane_id: this.id, arrival_time: IsNull()},
                     order: {id: 'DESC'}
                 });
                 if (flight === undefined) {
@@ -141,11 +141,12 @@ export class Plane extends BaseEntity {
                 const lostTime = new Date(this.last_seen.getTime());
                 lostTime.setMinutes(lostTime.getMinutes() + PlaneAlert.config['landingSignalLostThreshold']);
                 if (lostTime < new Date()) {
+                    //lost landing
                     PlaneAlert.log.info(`Plane ${this.icao} is lost`);
                     if (this.last_altitude !== null && this.last_altitude < PlaneAlert.config['landingAltitudeThreshold']) {
                         const nearestAirport = this.findNearestAirport();
                         let flight = await Flight.findOne({
-                            where: {plane_id: this.id, arrival_time: Not(IsNull())},
+                            where: {plane_id: this.id, arrival_time: IsNull()},
                             order: {id: 'DESC'}
                         });
                         if (flight === undefined) {
