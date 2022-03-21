@@ -1,5 +1,8 @@
 {
   "trackSource": "OPSN",
+  "VRS_BASE": "",
+  "VRS_USERNAME": "",
+  "VRS_PASSWORD": "",
   "takeoffAltitudeThreshold": 10000,
   "landingAltitudeThreshold": 10000,
   "landingSignalLostThreshold": 5,

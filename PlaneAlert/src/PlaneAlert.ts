@@ -12,6 +12,7 @@ import {DiscordWebhook} from "./entities/DiscordWebhook";
 import {DiscordAssignment} from "./entities/DiscordAssignment";
 import {TwitterAssignment} from "./entities/TwitterAssignment";
 import {TrackHistory} from "./entities/TrackHistory";
+import {VirtualRadarServerSource} from "./tracksources/virtual-radar-server/VirtualRadarServerSource";
 
 class PlaneAlertMain {
     public log: Logger;
@@ -89,6 +90,10 @@ class PlaneAlertMain {
                 this.log.info("Track source: FlighRadar 24");
                 const FlightRadar24Source = require('./tracksources/flight-radar-24/FlightRadar24Source');
                 this.trackSource = new FlightRadar24Source.FlightRadar24Source();
+                break;
+            case TrackSource.VIRTUAL_RADAR_SERVER:
+                this.log.info("Track source: Virtual Radar Server");
+                this.trackSource = new VirtualRadarServerSource();
                 break;
         }
     }
