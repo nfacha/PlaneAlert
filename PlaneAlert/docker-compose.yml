@@ -3,6 +3,7 @@ version: '3'
 services:
   postgres:
     image: postgres
+    restart: unless-stopped
     ports:
       - "5432:5432"
     env_file:
@@ -35,9 +36,10 @@ services:
       - ./:/app
     depends_on:
       - postgres
-    restart: always
+    restart: unless-stopped
 
   api:
+    restart: unless-stopped
     build:
       context: ../PlaneAlertAPI
       dockerfile: Dockerfile
@@ -55,6 +57,7 @@ services:
       - traefik.http.routers.api.tls.certresolver=certresolver
 
   traefik:
+    restart: unless-stopped
     image: traefik:v2.4
     command:
       - --api.insecure=true
