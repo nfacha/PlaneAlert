@@ -4,3 +4,7 @@
 node_modules/
 
 PlaneAlert/build/
+
+PlaneAlert/chart/values-facha.yaml
+
+PlaneAlert/chart/templates/planealert/fr24-track-source.configmap.yml

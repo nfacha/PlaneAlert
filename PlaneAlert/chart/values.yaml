@@ -1,0 +1,28 @@
+planeAlert:
+  domain: api.domain.com
+  trackSource: "VRS"
+  vrs:
+    url: ""
+    username: ""
+    password: ""
+  takeoffAltitudeThreshold: 10000
+  landingAltitudeThreshold: 10000
+  landingSignalLostThreshold: 5
+  landingNearestSuitableAirportDistance: 5
+sentry:
+  dsn: ""
+twitter:
+  appToken: ""
+  appSecret: ""
+aeroDataBox:
+  APIKey: ""
+postgresql:
+  auth:
+    postgresPassword: "planealert"
+    username: "planealert"
+    password: "planealert"
+    database: "planealert"
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi

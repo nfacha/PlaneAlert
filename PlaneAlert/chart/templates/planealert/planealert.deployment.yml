@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: planealert
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: planealert
+spec:
+  selector:
+    matchLabels:
+      app: planealert
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: planealert
+    spec:
+      containers:
+        - name: planealert
+          image: "ghcr.io/nfacha/planealert:master"
+          volumeMounts:
+            - mountPath: /app/config.json
+              name: plane-alert-config
+              subPath: config.json
+            - mountPath: /app/src/tracksources/flight-radar-24/FlightRadar24Source.ts
+              name: fr24-track-source
+              subPath: FlightRadar24Source.ts
+      volumes:
+        - name: plane-alert-config
+          configMap:
+            name: plane-alert-config
+        - name: fr24-track-source
+          configMap:
+            name: fr24-track-source
