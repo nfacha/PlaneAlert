@@ -6,21 +6,21 @@ metadata:
 data:
   config.json: |
     {
-    "trackSource": "{{.Values.planeAlert.trackSource}}",
-    "VRS_BASE": "{{.Values.planeAlert.vrs.url}}",
-    "VRS_USERNAME": "{{.Values.planeAlert.vrs.username}}",
-    "VRS_PASSWORD": "{{.Values.planeAlert.vrs.password}}",
-    "takeoffAltitudeThreshold": "{{.Values.planeAlert.takeoffAltitudeThreshold}}",
-    "landingAltitudeThreshold": "{{.Values.planeAlert.landingAltitudeThreshold}}",
-    "landingSignalLostThreshold": "{{.Values.planeAlert.landingSignalLostThreshold}}",
-    "landingNearestSuitableAirportDistance": "{{.Values.planeAlert.landingNearestSuitableAirportDistance}}",
-    "databaseHost": "{{.Release.Namespace}}-postgresql",
-    "databaseName": "{{ .Values.postgresql.auth.database }}",
-    "databaseUsername": "{{ .Values.postgresql.auth.username }}",
-    "databasePassword": "{{ .Values.postgresql.auth.password }}",
-    "sentryDSN": "{{ .Values.sentry.dsn }}",
-    "twitterAppToken": "{{.Values.twitter.appToken}}",
-    "twitterAppSecret": "{{.Values.twitter.appSecret}}",
-    "aeroDataBoxAPIKey": "{{.Values.aeroDataBox.APIKey}}"
+      "trackSource": "{{.Values.planeAlert.trackSource}}",
+      "VRS_BASE": "{{.Values.planeAlert.vrs.url}}",
+      "VRS_USERNAME": "{{.Values.planeAlert.vrs.username}}",
+      "VRS_PASSWORD": "{{.Values.planeAlert.vrs.password}}",
+      "takeoffAltitudeThreshold": {{.Values.planeAlert.takeoffAltitudeThreshold}},
+      "landingAltitudeThreshold": {{.Values.planeAlert.landingAltitudeThreshold}},
+      "landingSignalLostThreshold": {{.Values.planeAlert.landingSignalLostThreshold}},
+      "landingNearestSuitableAirportDistance": {{.Values.planeAlert.landingNearestSuitableAirportDistance}},
+      "databaseHost": "{{.Release.Namespace}}-postgresql",
+      "databaseName": "{{ .Values.postgresql.auth.database }}",
+      "databaseUsername": "{{ .Values.postgresql.auth.username }}",
+      "databasePassword": "{{ .Values.postgresql.auth.password }}",
+      "sentryDSN": "{{ .Values.sentry.dsn }}",
+      "twitterAppToken": "{{.Values.twitter.appToken}}",
+      "twitterAppSecret": "{{.Values.twitter.appSecret}}",
+      "aeroDataBoxAPIKey": "{{.Values.aeroDataBox.APIKey}}"
     }
 

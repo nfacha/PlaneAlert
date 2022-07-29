@@ -24,8 +24,8 @@ export class TrackHistory extends BaseEntity {
     velocity!: number | null;
     @Column({type: "float", nullable: true})
     verticalRate!: string | null;
-    @Column({type: "integer", nullable: true})
-    squawk!: number | null;
+    @Column({type: "varchar", length: 10, nullable: true})
+    squawk!: string | null;
     @JoinColumn({name: 'plane_id'})
     plane!: Plane;
 }
