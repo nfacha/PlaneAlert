@@ -18,6 +18,7 @@ spec:
       containers:
         - name: api
           image: "ghcr.io/nfacha/planealertapi:master"
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           volumeMounts:
