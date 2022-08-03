@@ -1,6 +1,6 @@
 planeAlert:
   domain: api.domain.com
-  trackSource: "VRS"
+  trackSource: "FachaDev"
   vrs:
     url: ""
     username: ""
