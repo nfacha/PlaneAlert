@@ -13,6 +13,7 @@ import {DiscordAssignment} from "./entities/DiscordAssignment";
 import {TwitterAssignment} from "./entities/TwitterAssignment";
 import {TrackHistory} from "./entities/TrackHistory";
 import {VirtualRadarServerSource} from "./tracksources/virtual-radar-server/VirtualRadarServerSource";
+import {FachaDevSource} from "./tracksources/facha-dev/FachaDevSource";
 
 class PlaneAlertMain {
     public log: Logger;
@@ -94,6 +95,10 @@ class PlaneAlertMain {
             case TrackSource.VIRTUAL_RADAR_SERVER:
                 this.log.info("Track source: Virtual Radar Server");
                 this.trackSource = new VirtualRadarServerSource();
+                break;
+            case TrackSource.FACHADEV:
+                this.log.info("Track source: Facha.Dev");
+                this.trackSource = new FachaDevSource();
                 break;
         }
     }
