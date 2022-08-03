@@ -19,6 +19,9 @@ export class VirtualRadarServerSource implements TrackSource {
         if (rx.data['acList'].length === 0) {
             return null;
         }
+        if (rx.data['states'] === undefined) {
+            return null;
+        }
         const state = rx.data['states'][0];
         return {
             icao24: icao24,
