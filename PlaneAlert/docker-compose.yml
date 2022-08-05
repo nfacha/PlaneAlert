@@ -21,12 +21,6 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
       - postgres
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.pgadmin.rule=Host(`db.plane-alert.facha.dev`)
-      - traefik.http.routers.pgadmin.tls=true
-      - traefik.http.routers.pgadmin.entrypoints=https
-      - traefik.http.routers.pgadmin.tls.certresolver=certresolver
 
   planealert:
     build:
@@ -37,52 +31,6 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
-
-  api:
-    restart: unless-stopped
-    build:
-      context: ../PlaneAlertAPI
-      dockerfile: Dockerfile
-    volumes:
-      - ../PlaneAlertAPI/:/app
-    ports:
-      - 3000
-    depends_on:
-      - postgres
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.api.rule=Host(`api.plane-alert.facha.dev`)
-      - traefik.http.routers.api.tls=true
-      - traefik.http.routers.api.entrypoints=https
-      - traefik.http.routers.api.tls.certresolver=certresolver
-
-  traefik:
-    restart: unless-stopped
-    image: traefik:v2.4
-    command:
-      - --api.insecure=true
-      - --providers.docker
-      - --entrypoints.http.address=:80
-      - --entrypoints.https.address=:443
-      - --accesslog
-      - --providers.docker.exposedbydefault=false
-      - --certificatesresolvers.certresolver.acme.email=nuno@facha.dev
-      - --certificatesresolvers.certresolver.acme.storage=/acme.json
-      - --certificatesresolvers.certresolver.acme.httpchallenge=true
-      - --certificatesresolvers.certresolver.acme.httpchallenge.entrypoint=http
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /root/acme.json:/acme.json
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:[a-z-.]+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=http"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 
 volumes:
