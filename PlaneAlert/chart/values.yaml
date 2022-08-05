@@ -1,6 +1,8 @@
 planeAlert:
   domain: api.domain.com
   trackSource: "FachaDev"
+  fachaDev:
+    token: ""
   vrs:
     url: ""
     username: ""

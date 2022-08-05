@@ -10,6 +10,7 @@ data:
       "VRS_BASE": "{{.Values.planeAlert.vrs.url}}",
       "VRS_USERNAME": "{{.Values.planeAlert.vrs.username}}",
       "VRS_PASSWORD": "{{.Values.planeAlert.vrs.password}}",
+      "FachaDevToken": "{{.Values.planeAlert.fachaDev.token}}",
       "takeoffAltitudeThreshold": {{.Values.planeAlert.takeoffAltitudeThreshold}},
       "landingAltitudeThreshold": {{.Values.planeAlert.landingAltitudeThreshold}},
       "landingSignalLostThreshold": {{.Values.planeAlert.landingSignalLostThreshold}},

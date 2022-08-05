@@ -3,6 +3,7 @@
   "VRS_BASE": "",
   "VRS_USERNAME": "",
   "VRS_PASSWORD": "",
+  "FachaDevToken": "",
   "takeoffAltitudeThreshold": 10000,
   "landingAltitudeThreshold": 10000,
   "landingSignalLostThreshold": 5,
