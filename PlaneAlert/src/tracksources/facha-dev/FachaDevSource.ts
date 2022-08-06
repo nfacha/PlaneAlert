@@ -21,8 +21,8 @@ export class FachaDevSource implements TrackSource {
                 latitude: state['lat'],
                 barometricAltitude: state['altitude'],
                 onGround: state['ground'],
-                velocity: 0,
-                verticalRate: 0,
+                velocity: state['speed'],
+                verticalRate: state['verticalRate'],
                 squawk: state['squawk'],
                 emergencyStatus: null,
             }
