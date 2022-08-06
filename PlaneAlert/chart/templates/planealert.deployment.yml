@@ -23,13 +23,7 @@ spec:
             - mountPath: /app/config.json
               name: plane-alert-config
               subPath: config.json
-            - mountPath: /app/src/tracksources/flight-radar-24/FlightRadar24Source.ts
-              name: fr24-track-source
-              subPath: FlightRadar24Source.ts
       volumes:
         - name: plane-alert-config
           configMap:
             name: plane-alert-config
-        - name: fr24-track-source
-          configMap:
-            name: fr24-track-source
