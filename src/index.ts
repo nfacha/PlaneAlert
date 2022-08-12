@@ -1,6 +1,4 @@
 import {Logger} from "tslog";
-import {LessThan} from "typeorm";
-import {Plane} from "./entities/Plane";
 import * as fs from "fs";
 import {TrackSource} from "./enum/TrackSource";
 import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
@@ -68,22 +66,6 @@ class Index {
             this.countries = JSON.parse(fs.readFileSync("data/countries.json", "utf8"));
             this.log.info("Countries Data Updated");
         });
-        // this.initDatabase().then(async () => {
-        //     if (this.db.isConnected) {
-        //         this.log.info("Database initialized");
-        //         TwitterAccount.find().then(async (twitterAccounts) => {
-        //             for (const twitterAccount of twitterAccounts) {
-        //                 this.twitterAccounts.push(twitterAccount);
-        //                 this.log.info("loaded  Twitter Account: " + twitterAccount.username);
-        //                 // twitterAccount.getClient().v2.tweet({
-        //                 //     text: "Testing Twitter API",
-        //                 // })
-        //             }
-        //         });
-        //         await this.updatePlaneData();
-        //         //
-        //     }
-        // });
         switch (this.config.tracksource.primary) {
             case TrackSource.OPEN_SKY_NETWORK:
                 this.log.info("Track source: OpenSky Network");
@@ -99,86 +81,19 @@ class Index {
                 break;
         }
         this.loadAircraft();
+        setInterval(() => {
+            for (const aircraft of this.aircraft) {
+                aircraft.check();
+            }
+        }, 1000 * this.config.refreshInterval);
     }
 
     private loadConfig() {
         return YAML.parse(fs.readFileSync("./config/main.yaml", "utf8"));
     }
 
-    private async updatePlaneData() {
-        if (PlaneAlert.airports.length > 0) {
-            const planes = await Plane.find({
-                where: [
-                    {
-                        active: true,
-                        next_refresh: LessThan(new Date()),
-                    },
-                    {
-                        active: true,
-                        next_refresh: null,
-                    }
-                ],
-                relations: ["twitterAccountAssignments", "discordAccountAssignments"],
-            });
-            for (const plane of planes) {
-                this.log.info("Updating plane: " + plane.icao);
-                if (plane.icao === "" || plane.icao === null) {
-                    this.log.warn("Plane " + plane.name + " has no ICAO");
-                    // if (this.config['aeroDataBoxAPIKey'] !== "") {
-                    //     try {
-                    //         let rx = await axios.get('https://aerodatabox.p.rapidapi.com/aircrafts/reg/' + plane.registration, {
-                    //             headers: {
-                    //                 "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
-                    //                 "x-rapidapi-key": this.config['aeroDataBoxAPIKey'],
-                    //             }
-                    //         });
-                    //         if (rx.status === 200) {
-                    //             plane.icao = rx.data.hexIcao;
-                    //             this.log.info("Found ICAO: " + plane.icao + " for " + plane.name);
-                    //             await plane.save();
-                    //         }
-                    //     } catch (e) {
-                    //         plane.active = false;
-                    //         await plane.save();
-                    //     }
-                    //
-                    // }
-                    continue;
-                }
-                if (plane.registration === "" || plane.registration === null) {
-                    this.log.warn("Plane " + plane.name + " has no registration");
-                    // if (this.config['aeroDataBoxAPIKey'] !== "") {
-                    //     try {
-                    //         let rx = await axios.get('https://aerodatabox.p.rapidapi.com/aircrafts/icao24/' + plane.icao, {
-                    //             headers: {
-                    //                 "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
-                    //                 "x-rapidapi-key": this.config['aeroDataBoxAPIKey'],
-                    //             }
-                    //         });
-                    //         if (rx.status === 200) {
-                    //             plane.registration = rx.data.reg;
-                    //             this.log.info("Found REG: " + plane.registration + " for " + plane.name);
-                    //             await plane.save();
-                    //         }
-                    //     } catch (e) {
-                    //         plane.active = false;
-                    //         await plane.save();
-                    //     }
-                    //
-                    // }
-                    continue;
-                }
-                await plane.update();
-            }
-        }
-        setTimeout(() => {
-            this.updatePlaneData();
-        }, 1000);
-    }
-
     private loadAircraft() {
         this.log.info("Loading Aircraft");
-        //loop all files ending in yaml in the aircraft directory
         const files = fs.readdirSync('./config/aircraft');
         setTimeout(() => {
             for (const i in files) {

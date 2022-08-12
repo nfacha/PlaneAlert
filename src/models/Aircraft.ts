@@ -58,4 +58,14 @@ export class Aircraft {
         PlaneAlert.log.info("Saving aircraft " + this.name);
         fs.writeFileSync("./config/aircraft/" + this.icao + ".yaml", YAML.stringify(this));
     }
+
+    public async check() {
+        PlaneAlert.log.info(`Checking aircraft ${this.name} (${this.icao})`);
+        const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
+        if (data === undefined) {
+            PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) returned no data`);
+            return;
+        }
+        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned data: ${JSON.stringify(data)}`);
+    }
 }

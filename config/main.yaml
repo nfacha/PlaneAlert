@@ -8,6 +8,9 @@ tracksource:
     base: null
     username: null
     password: null
+
+refreshInterval: 5
+
 thresholds:
   takeoff: 1000
   landing: 10000
