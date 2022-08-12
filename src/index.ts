@@ -27,6 +27,10 @@ class Index {
     constructor() {
         this.log = new Logger({minLevel: 'debug'});
         this.log.info("PlaneAlert starting");
+        process.on('exit', this.exitHandler.bind(this));
+        process.on('SIGINT', this.exitHandler.bind(this));
+        process.on('SIGUSR1', this.exitHandler.bind(this));
+        process.on('SIGUSR2', this.exitHandler.bind(this));
         this.config = this.loadConfig();
         if (this.config.telemetry.sentry.dsn !== null) {
             Sentry.init({
@@ -186,6 +190,13 @@ class Index {
                 }
             }
         }, 500);
+    }
+
+    private exitHandler() {
+        PlaneAlert.log.info("Cleaning up before exit");
+        for (const aircraft of this.aircraft) {
+            aircraft.save();
+        }
     }
 }
 
