@@ -1,7 +1,8 @@
 import YAML from 'yaml'
-import {PlaneAlert} from "../PlaneAlert";
+import {PlaneAlert} from "../index";
 
 export class Aircraft {
+
     public name: string;
     public icao: string;
     public registration: string;
@@ -31,12 +32,14 @@ export class Aircraft {
         this.lon = aircraft.config.lon;
         this.alt = aircraft.config.alt;
 
-        if (this.registration === "" || this.registration === null) {
-            PlaneAlert.log.warn("Plane " + this.name + " has no registration");
-        }
-        if (this.icao === "" || this.icao === null) {
-            PlaneAlert.log.error("Plane " + this.name + " has no ICAO");
-            throw new Error("Plane " + this.name + " has no ICAO");
-        }
+        setTimeout(() => {
+            if (this.registration === "" || this.registration === null) {
+                PlaneAlert.log.warn("Plane " + this.name + " has no registration");
+            }
+            if (this.icao === "" || this.icao === null) {
+                PlaneAlert.log.error("Plane " + this.name + " has no ICAO");
+                throw new Error("Plane " + this.name + " has no ICAO");
+            }
+        }, 2500);
     }
 }

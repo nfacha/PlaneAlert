@@ -1,6 +1,6 @@
 import {BaseEntity, Column, Entity, IsNull, OneToMany, PrimaryGeneratedColumn} from "typeorm";
-import {PlaneAlert} from "../PlaneAlert";
-import {PlaneEvents} from "../PlaneEvents";
+import {PlaneAlert} from "../index";
+import {PlaneEvents} from "../enum/PlaneEvents";
 import {GeoUtils} from "../utils/GeoUtils";
 import {Flight} from "./Flight";
 import {Webhook} from "discord-webhook-node";

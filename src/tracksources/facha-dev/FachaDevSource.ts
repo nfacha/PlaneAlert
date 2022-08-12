@@ -1,5 +1,5 @@
 import axios from "axios";
-import {PlaneAlert} from "../../PlaneAlert";
+import {PlaneAlert} from "../../index";
 import {PlaneTrackResponse} from "../PlaneTrackResponse";
 import {TrackSource} from "../TrackSource";
 
@@ -9,7 +9,7 @@ export class FachaDevSource implements TrackSource {
     public async getPlaneStatus(icao24: string): Promise<PlaneTrackResponse | null> {
         PlaneAlert.log.debug(`Getting plane status for ${icao24} from Api.Facha.Dev`);
         try {
-            const rx = await axios.get(`${this.BASE}v1/aircraft/live/icao/${icao24}`, PlaneAlert.config['FachaDevToken'] === '' ? undefined : {headers: {'Authorization': `${PlaneAlert.config['FachaDevToken']}`}});
+            const rx = await axios.get(`${this.BASE}v1/aircraft/live/icao/${icao24}`, PlaneAlert.config.tracksource.FachaDev.token === '' ? undefined : {headers: {'Authorization': `${PlaneAlert.config.tracksource.FachaDev.token}`}});
             if (rx.status !== 200) {
                 return null;
             }

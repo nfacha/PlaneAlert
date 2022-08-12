@@ -1,5 +1,5 @@
 import axios from "axios";
-import {PlaneAlert} from "../../PlaneAlert";
+import {PlaneAlert} from "../../index";
 import {PlaneTrackResponse} from "../PlaneTrackResponse";
 import {TrackSource} from "../TrackSource";
 
@@ -7,10 +7,10 @@ export class VirtualRadarServerSource implements TrackSource {
 
     public async getPlaneStatus(icao24: string): Promise<PlaneTrackResponse | null> {
         PlaneAlert.log.debug(`Getting plane status for ${icao24} from VRS`);
-        const rx = await axios.get(`${PlaneAlert.config['VRS_BASE']}/AircraftList.json?fIcoQ=${icao24.toLowerCase()}`, {
+        const rx = await axios.get(`${PlaneAlert.config.tracksource.vrs.base}/AircraftList.json?fIcoQ=${icao24.toLowerCase()}`, {
             auth: {
-                username: PlaneAlert.config['VRS_USERNAME'],
-                password: PlaneAlert.config['VRS_PASSWORD']
+                username: PlaneAlert.config.tracksource.vrs.username,
+                password: PlaneAlert.config.tracksource.vrs.password
             }
         })
         if (rx.data['acList'] === null) {

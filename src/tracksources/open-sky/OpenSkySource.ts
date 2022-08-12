@@ -1,5 +1,5 @@
 import axios from "axios";
-import {PlaneAlert} from "../../PlaneAlert";
+import {PlaneAlert} from "../../index";
 import {PlaneTrackResponse} from "../PlaneTrackResponse";
 import {TrackSource} from "../TrackSource";
 

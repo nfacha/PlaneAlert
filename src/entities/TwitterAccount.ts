@@ -1,6 +1,6 @@
 import {BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {TwitterApi} from "twitter-api-v2";
-import {PlaneAlert} from "../PlaneAlert";
+import {PlaneAlert} from "../index";
 import {TwitterAssignment} from "./TwitterAssignment";
 
 @Entity()
