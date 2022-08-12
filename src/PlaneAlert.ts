@@ -14,8 +14,9 @@ import {TwitterAssignment} from "./entities/TwitterAssignment";
 import {TrackHistory} from "./entities/TrackHistory";
 import {VirtualRadarServerSource} from "./tracksources/virtual-radar-server/VirtualRadarServerSource";
 import {FachaDevSource} from "./tracksources/facha-dev/FachaDevSource";
+import {Aircraft} from "./models/Aircraft";
 
-class PlaneAlertMain {
+class Main {
     public log: Logger;
     public db: any;
     public config: any;
@@ -24,11 +25,12 @@ class PlaneAlertMain {
     public regions: any = [];
     public countries: any = [];
     public twitterAccounts: TwitterAccount[] = [];
+    public aircraft: any = [] //TODO
 
 
     constructor() {
         this.log = new Logger();
-        this.log.info("PlaneAlert started");
+        this.log.info("PlaneAlert starting");
         this.config = this.loadConfig();
         if (this.config['sentryDSN'] !== '') {
             Sentry.init({
@@ -66,31 +68,26 @@ class PlaneAlertMain {
             this.countries = JSON.parse(fs.readFileSync("data/countries.json", "utf8"));
             this.log.info("Countries Data Updated");
         });
-        this.initDatabase().then(async () => {
-            if (this.db.isConnected) {
-                this.log.info("Database initialized");
-                TwitterAccount.find().then(async (twitterAccounts) => {
-                    for (const twitterAccount of twitterAccounts) {
-                        this.twitterAccounts.push(twitterAccount);
-                        this.log.info("loaded  Twitter Account: " + twitterAccount.username);
-                        // twitterAccount.getClient().v2.tweet({
-                        //     text: "Testing Twitter API",
-                        // })
-                    }
-                });
-                await this.updatePlaneData();
-                //
-            }
-        });
+        // this.initDatabase().then(async () => {
+        //     if (this.db.isConnected) {
+        //         this.log.info("Database initialized");
+        //         TwitterAccount.find().then(async (twitterAccounts) => {
+        //             for (const twitterAccount of twitterAccounts) {
+        //                 this.twitterAccounts.push(twitterAccount);
+        //                 this.log.info("loaded  Twitter Account: " + twitterAccount.username);
+        //                 // twitterAccount.getClient().v2.tweet({
+        //                 //     text: "Testing Twitter API",
+        //                 // })
+        //             }
+        //         });
+        //         await this.updatePlaneData();
+        //         //
+        //     }
+        // });
         switch (this.config['trackSource']) {
             case TrackSource.OPEN_SKY_NETWORK:
                 this.log.info("Track source: OpenSky Network");
                 this.trackSource = new OpenSkySource();
-                break;
-            case TrackSource.FLIGHT_RADAR_24    :
-                this.log.info("Track source: FlighRadar 24");
-                const FlightRadar24Source = require('./tracksources/flight-radar-24/FlightRadar24Source');
-                this.trackSource = new FlightRadar24Source.FlightRadar24Source();
                 break;
             case TrackSource.VIRTUAL_RADAR_SERVER:
                 this.log.info("Track source: Virtual Radar Server");
@@ -101,6 +98,7 @@ class PlaneAlertMain {
                 this.trackSource = new FachaDevSource();
                 break;
         }
+        this.loadAircraft();
     }
 
     async initDatabase() {
@@ -204,6 +202,20 @@ class PlaneAlertMain {
             this.updatePlaneData();
         }, 1000);
     }
+
+    private loadAircraft() {
+        this.log.info("Loading Aircraft");
+        //loop all files ending in yaml in the aircraft directory
+        const files = fs.readdirSync('./config/aircraft');
+        for (const i in files) {
+            let file = files[i];
+            if (file.endsWith('.yaml')) {
+                this.log.info("Loading Aircraft: " + file);
+                let aircraft = new Aircraft(fs.readFileSync('./config/aircraft/' + file, 'utf8'));
+                this.aircraft.push(aircraft);
+            }
+        }
+    }
 }
 
-export const PlaneAlert = new PlaneAlertMain();
+export const PlaneAlert = new Main();

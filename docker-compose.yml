@@ -24,7 +24,7 @@ services:
 
   planealert:
     build:
-      context: .
+      context: PlaneAlert
       dockerfile: Dockerfile
     volumes:
       - ./:/app

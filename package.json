@@ -5,9 +5,9 @@
   "main": "PlaneAlert.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "node_modules/.bin/tsc",
     "start": "node build/PlaneAlert.js",
-    "dev": "tsc && node build/PlaneAlert.js"
+    "dev": "rm -rf /build/config && cp -r config build/config && tsc && node build/PlaneAlert.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "tslog": "^3.3.1",
     "twitter-api-v2": "^1.11.0",
     "typeorm": "^0.2.41",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "yaml": "^2.1.1"
   }
 }

@@ -1,0 +1,18 @@
+{
+  "trackSource": "VRS",
+  "VRS_BASE": "https://radar.facha.dev/VirtualRadar",
+  "VRS_USERNAME": "api",
+  "VRS_PASSWORD": "api2022",
+  "takeoffAltitudeThreshold": 10000,
+  "landingAltitudeThreshold": 10000,
+  "landingSignalLostThreshold": 5,
+  "landingNearestSuitableAirportDistance": 5,
+  "databaseHost": "postgres",
+  "databaseName": "planealert",
+  "databaseUsername": "postgres",
+  "databasePassword": "123456789",
+  "sentryDSN": "https://9ad1fecc7e0c4f67b85aacb251dce1a8@sentry.facha.dev/12",
+  "twitterAppToken": "wTynJC8RQbELI6ocrelki0zLV",
+  "twitterAppSecret": "oT8YQ4yepDT8MYF5zmKmSz1Xd0gYtCIks0VWVF7UTqjkU7kbCN",
+  "aeroDataBoxAPIKey": "f11eb4e347mshffd6fb6548fbb95p12c8f4jsnd2bdda89736c"
+}

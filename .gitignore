@@ -5,6 +5,17 @@ node_modules/
 
 PlaneAlert/build/
 
-PlaneAlert/chart/values-facha.yaml
+chart/values-facha.yaml
 
-PlaneAlert/chart/templates/planealert/fr24-track-source.configmap.yml
+chart/templates/planealert/fr24-track-source.configmap.yml
+node_modules
+../.idea
+.idea
+build/*.js
+build/*/*.js
+build/*/*/*.js
+data/*.csv
+data/*.json
+pg.env
+pgadmin.env
+../config.json

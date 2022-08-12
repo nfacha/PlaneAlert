@@ -1,5 +1,5 @@
 FROM node:17-buster
-COPY . /app
+COPY PlaneAlert /app
 WORKDIR /app
 RUN npm i
 #RUN npm run build
