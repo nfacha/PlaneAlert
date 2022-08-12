@@ -11,7 +11,7 @@ export class FachaDevSource implements TrackSource {
         return new Promise<PlaneDetail | null>(async (resolve, reject) => {
             PlaneAlert.log.debug(`Getting plane detail for ${icao24} from Api.Facha.Dev`);
             try {
-                const rx = await axios.get(`https://api.facha.dev/v1/aircraft/detail/icao/${icao24}`, PlaneAlert.config.tracksource.FachaDev.token === '' ? undefined : {headers: {'Authorization': `${PlaneAlert.config.tracksource.FachaDev.token}`}});
+                const rx = await axios.get(`https://api.facha.dev/v1/aircraft/detail/icao/${icao24}`, PlaneAlert.config.tracksource.FachaDev.token === null ? undefined : {headers: {'Authorization': `${PlaneAlert.config.tracksource.FachaDev.token}`}});
                 if (rx.status !== 200) {
                     return null;
                 }
@@ -26,14 +26,17 @@ export class FachaDevSource implements TrackSource {
         return new Promise<PlaneTrackResponse | null>(async (resolve, reject) => {
             PlaneAlert.log.debug(`Getting plane status for ${icao24} from Api.Facha.Dev`);
             try {
-                const rx = await axios.get(`https://api.facha.dev/v1/aircraft/live/icao/${icao24}`, PlaneAlert.config.tracksource.FachaDev.token === '' ? undefined : {headers: {'Authorization': `${PlaneAlert.config.tracksource.FachaDev.token}`}});
+                const rx = await axios.get(`https://api.facha.dev/v1/aircraft/live/icao/${icao24}`, PlaneAlert.config.tracksource.FachaDev.token === null ? undefined : {headers: {'Authorization': `${PlaneAlert.config.tracksource.FachaDev.token}`}});
                 if (rx.status !== 200) {
                     return null;
                 }
                 const state = rx.data;
+                if (state.error !== undefined) {
+                    resolve(null);
+                }
                 resolve({
                     icao24: icao24,
-                    callsign: state['callsign'].trim(),
+                    callsign: state['callsign'],
                     longitude: state['lon'],
                     latitude: state['lat'],
                     barometricAltitude: state['baroAltitude'],
