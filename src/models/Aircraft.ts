@@ -26,6 +26,13 @@ export class Aircraft {
         alt: 0
     }
 
+    private notifications = {
+        discord: {
+            enabled: false,
+            webhooks: []
+        }
+    }
+
 
     constructor(file: string, fileName: string) {
         let aircraft = YAML.parse(file);

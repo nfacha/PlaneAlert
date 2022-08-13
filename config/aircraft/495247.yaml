@@ -1,14 +1,18 @@
 config:
-  lastSeen: 1660419307205
-  onGround: true
-  liveTrack: false
-  squawk: ""
-  lat: 51.477608
-  lon: -0.460479
-  alt: 0
+  lastSeen: 1660419833683
+  onGround: false
+  liveTrack: true
+  squawk: "2013"
+  lat: 51.437256
+  lon: -0.316599
+  alt: 4150
+notifications:
+  discord:
+    enabled: false
+    webhooks: []
 fileName: 495247.yaml
 name: Test
-icao: XXXX
+icao: 4008B1
 registration: D-AIJB
 allowedAirports:
   - large_airport
