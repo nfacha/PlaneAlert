@@ -71,9 +71,10 @@ export class Aircraft {
         if (data === null) {
             PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
             if (!this.config.onGround) {
-                let triggerTime = new Date();
+                let triggerTime = new Date(this.config.lastSeen);
                 triggerTime.setMinutes(triggerTime.getMinutes() + PlaneAlert.config.thresholds.signalLoss);
-                if (this.config.lastSeen < (new Date().getTime() - triggerTime.getTime())) {
+                PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
+                if (triggerTime < new Date()) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) has lost signal`);
                     const nearestAirport = this.findNearestAirport();
                     if (nearestAirport !== null) {
@@ -82,27 +83,21 @@ export class Aircraft {
                         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) has lost signal`);
                     }
                     this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
+                    this.config.onGround = true;
                 }
             }
             this.config.liveTrack = false;
         } else {
-            this.config.liveTrack = true;
-            this.config.lastSeen = new Date().getTime();
-            this.config.onGround = data.onGround;
-            this.config.lat = data.latitude;
-            this.config.lon = data.longitude;
-            this.config.alt = data.barometricAltitude;
-            this.config.squawk = data.squawk;
 
             //check time
             if (!data.onGround
                 && data.barometricAltitude !== null
                 && data.barometricAltitude < PlaneAlert.config.thresholds.takeoff
-                && (!this.config.liveTrack || data.onGround)) {
+                && this.config.onGround) {
                 //Plane takeoff
                 const nearestAirport = this.findNearestAirport();
                 if (nearestAirport !== null) {
-                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
                 } else {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off`);
                 }
@@ -111,7 +106,7 @@ export class Aircraft {
             if (data.onGround
                 && data.barometricAltitude !== null
                 && data.barometricAltitude < PlaneAlert.config.thresholds.landing
-                && !data.onGround) {
+                && !this.config.onGround) {
                 PlaneAlert.log.info(`Plane ${this.icao} is landing`);
                 //Plane landing
                 const nearestAirport = this.findNearestAirport();
@@ -122,6 +117,13 @@ export class Aircraft {
                 }
                 this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
             }
+            this.config.liveTrack = true;
+            this.config.lastSeen = new Date().getTime();
+            this.config.onGround = data.onGround;
+            this.config.lat = data.latitude;
+            this.config.lon = data.longitude;
+            this.config.alt = data.barometricAltitude;
+            this.config.squawk = data.squawk;
         }
 
         this.save();
@@ -156,7 +158,7 @@ export class Aircraft {
 
     private async triggerEvent(event: PlaneEvents, data: any = null) {
         return new Promise((resolve, reject) => {
-            PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
+            PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
         });
     }
 }

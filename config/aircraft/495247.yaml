@@ -1,15 +1,15 @@
 config:
-  lastSeen: 1660416166610
+  lastSeen: 1660419307205
   onGround: true
-  liveTrack: true
-  squawk: "2023"
-  lat: 51.464802
-  lon: -0.483918
+  liveTrack: false
+  squawk: ""
+  lat: 51.477608
+  lon: -0.460479
   alt: 0
 fileName: 495247.yaml
 name: Test
-icao: 407844
-registration: G-NEOZ
+icao: XXXX
+registration: D-AIJB
 allowedAirports:
   - large_airport
   - medium_airport
