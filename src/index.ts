@@ -30,6 +30,8 @@ class Index {
         process.on('SIGUSR1', this.exitHandler.bind(this));
         process.on('SIGUSR2', this.exitHandler.bind(this));
         this.config = this.loadConfig();
+        this.log.setSettings({minLevel: this.config.log.level});
+        this.log.info("Log level set to " + this.config.log.level);
         if (this.config.telemetry.sentry.dsn !== null) {
             Sentry.init({
                 dsn: this.config.telemetry.sentry.dsn,
@@ -100,7 +102,7 @@ class Index {
                 let file = files[i];
                 if (file.endsWith('.yaml')) {
                     this.log.info("Loading Aircraft: " + file);
-                    let aircraft = new Aircraft(fs.readFileSync('./config/aircraft/' + file, 'utf8'));
+                    let aircraft = new Aircraft(fs.readFileSync('./config/aircraft/' + file, 'utf8'), file);
                     this.aircraft.push(aircraft);
                 }
             }

@@ -24,3 +24,6 @@ telemetry:
 twitter:
   appToken: null
   appSecret: null
+
+log:
+  level: DEBUG

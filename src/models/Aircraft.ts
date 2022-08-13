@@ -3,9 +3,12 @@ import {PlaneAlert} from "../index";
 import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
+import {PlaneEvents} from "../enum/PlaneEvents";
+import {Flight} from "../entities/Flight";
 
 export class Aircraft {
 
+    public fileName: string;
     public name: string;
     public icao: string;
     public registration: string;
@@ -24,8 +27,9 @@ export class Aircraft {
     }
 
 
-    constructor(file: string) {
+    constructor(file: string, fileName: string) {
         let aircraft = YAML.parse(file);
+        this.fileName = fileName;
         this.name = aircraft.name;
         this.icao = aircraft.icao;
         this.registration = aircraft.registration;
@@ -57,26 +61,27 @@ export class Aircraft {
     }
 
     private save() {
-        PlaneAlert.log.info("Saving aircraft " + this.name);
-        fs.writeFileSync("./config/aircraft/" + this.icao + ".yaml", YAML.stringify(this));
+        PlaneAlert.log.debug("Saving aircraft " + this.name);
+        fs.writeFileSync("./config/aircraft/" + this.fileName, YAML.stringify(this));
     }
 
     public async check() {
         PlaneAlert.log.info(`Checking aircraft ${this.name} (${this.icao})`);
         const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
         if (data === null) {
-            PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) returned no data`);
+            PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
             if (!this.config.onGround) {
                 let triggerTime = new Date();
                 triggerTime.setMinutes(triggerTime.getMinutes() + PlaneAlert.config.thresholds.signalLoss);
                 if (this.config.lastSeen < (new Date().getTime() - triggerTime.getTime())) {
-                    PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) has lost signal`);
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) has lost signal`);
                     const nearestAirport = this.findNearestAirport();
                     if (nearestAirport !== null) {
-                        PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
+                        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
                     } else {
-                        PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) has lost signal`);
+                        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) has lost signal`);
                     }
+                    this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
                 }
             }
             this.config.liveTrack = false;
@@ -101,6 +106,7 @@ export class Aircraft {
                 } else {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off`);
                 }
+                this.triggerEvent(PlaneEvents.PLANE_TAKEOFF, {nearestAirport: nearestAirport?.airport});
             }
             if (data.onGround
                 && data.barometricAltitude !== null
@@ -114,6 +120,7 @@ export class Aircraft {
                 } else {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) landed`);
                 }
+                this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
             }
         }
 
@@ -145,5 +152,11 @@ export class Aircraft {
             airport: nearest_airport,
             distance: min_distance
         };
+    }
+
+    private async triggerEvent(event: PlaneEvents, data: any = null) {
+        return new Promise((resolve, reject) => {
+            PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
+        });
     }
 }
