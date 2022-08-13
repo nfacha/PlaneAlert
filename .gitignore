@@ -19,3 +19,5 @@ data/*.json
 pg.env
 pgadmin.env
 ../config.json
+
+build/
