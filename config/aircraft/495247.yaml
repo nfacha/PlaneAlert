@@ -1,20 +1,25 @@
 meta:
-  lastSeen: 1660422620874
+  lastSeen: 1660424369606
   onGround: false
   liveTrack: true
-  squawk: "6307"
-  lat: 49.008799
-  lon: 0.356767
-  alt: 35050
+  squawk: "3461"
+  lat: 51.403107
+  lon: -0.089969
+  alt: 6050
 notifications:
   includeScreenshots: true
   discord:
+    enabled: false
+    webhooks: []
+  twitter:
     enabled: true
-    webhooks:
-      - https://discordapp.com/api/webhooks/1008076795624554677/DRMcT8QDEriIJG028lxDc1Ww9tvB0gAlEeTLqcyUcjseOuIMDKghDCf7BAj_r1TczV5b
+    accounts:
+      - username: PlaneAlert
+        accessToken: ""
+        accessSecret: ""
 fileName: 495247.yaml
 name: Test
-icao: 40624F
+icao: "406E10"
 registration: D-AIJB
 allowedAirports:
   - large_airport

@@ -19,7 +19,7 @@ thresholds:
 
 telemetry:
   sentry:
-    dsn: https://9ad1fecc7e0c4f67b85aacb251dce1a8@sentry.facha.dev/12
+    dsn: null
 
 twitter:
   appToken: null

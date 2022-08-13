@@ -7,6 +7,8 @@ import {PlaneEvents} from "../enum/PlaneEvents";
 import {Webhook} from "discord-webhook-node";
 import axios from "axios";
 import {Browser} from "puppeteer";
+import {TwitterApi} from "twitter-api-v2";
+import TwitterUtils from "../utils/TwitterUtils";
 
 export class Aircraft {
 
@@ -33,6 +35,15 @@ export class Aircraft {
         discord: {
             enabled: false,
             webhooks: []
+        },
+        twitter: {
+            enabled: false,
+            accounts: [
+                {
+                   accessToken: '',
+                     accessSecret: '',
+                }
+            ]
         }
     }
 
@@ -176,11 +187,11 @@ export class Aircraft {
             PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
             switch (event) {
                 case PlaneEvents.PLANE_TAKEOFF:
+                    let hasScreenshot = false;
+                    if(this.notifications.includeScreenshots){
+                        hasScreenshot = await this.takeScreenshot();
+                    }
                     if (this.notifications.discord.enabled) {
-                        let hasScreenshot = false;
-                        if(this.notifications.includeScreenshots){
-                            hasScreenshot = await this.takeScreenshot();
-                        }
 
                         for (const discord of this.notifications.discord.webhooks) {
                             const hook = new Webhook(discord);
@@ -193,6 +204,19 @@ export class Aircraft {
                                 await hook.sendFile(`/tmp/${this.icao}.png`);
                             }
                             hook.send(`**${this.name}** (${this.registration}) took off from **${data.nearestAirport.name}** at ${new Date().toLocaleString()}\n${adsbExchangeLink}`);
+                        }
+                    }
+                    if (this.notifications.twitter.enabled) {
+                        for(const account of this.notifications.twitter.accounts) {
+                            const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
+                            let mediaId = '';
+                            if(hasScreenshot){
+                                mediaId = await client.v1.uploadMedia(`/tmp/${this.icao}.png`);
+                            }
+                            await client.v2.tweet({
+                                text: `${this.name} (#${this.icao}) (#${this.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                media: hasScreenshot ? {media_ids: [mediaId]} : undefined
+                            })
                         }
                     }
                     resolve(true);
