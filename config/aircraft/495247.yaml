@@ -1,0 +1,16 @@
+config:
+  lastSeen: 1660314297909
+  onGround: false
+  liveTrack: true
+  squawk: ""
+  lat: 38.056362
+  lon: -26.893934
+  alt: 21875
+name: Test
+icao: 495247
+registration: CS-TRG
+allowedAirports:
+  - large_airport
+  - medium_airport
+  - small_airport
+refreshInterval: 60

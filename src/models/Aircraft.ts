@@ -2,6 +2,7 @@ import YAML from 'yaml'
 import {PlaneAlert} from "../index";
 import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
+import {GeoUtils} from "../utils/GeoUtils";
 
 export class Aircraft {
 
@@ -16,6 +17,7 @@ export class Aircraft {
         lastSeen: 0,
         onGround: false,
         liveTrack: false,
+        squawk: "",
         lat: 0,
         lon: 0,
         alt: 0
@@ -62,10 +64,55 @@ export class Aircraft {
     public async check() {
         PlaneAlert.log.info(`Checking aircraft ${this.name} (${this.icao})`);
         const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
-        if (data === undefined) {
+        if (data === null) {
             PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) returned no data`);
-            return;
+            this.config.liveTrack = false;
+        } else {
+            this.config.liveTrack = true;
+            this.config.lastSeen = new Date().getTime();
+            this.config.onGround = data.onGround;
+            this.config.lat = data.latitude;
+            this.config.lon = data.longitude;
+            this.config.alt = data.barometricAltitude;
+            this.config.squawk = data.squawk;
+
+            //check time
+            if (!data.onGround
+                && data.barometricAltitude !== null
+                && data.barometricAltitude < PlaneAlert.config.thresholds.takeoff
+                && (!this.config.liveTrack || data.onGround)) {
+                //Plane takeoff
+                PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off`);
+            }
         }
-        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned data: ${JSON.stringify(data)}`);
+
+        this.save();
+        // PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned data: ${JSON.stringify(data)}`);
+    }
+
+    private findNearestAirport() {
+        if (this.config.lon === null || this.config.lat === null || PlaneAlert.airports === null) {
+            return null;
+        }
+        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) searching for nearest airport of ${this.config.lat}/${this.config.lon}`);
+        let min_distance = Number.MAX_SAFE_INTEGER;
+        let nearest_airport = null;
+        for (const airport of PlaneAlert.airports) {
+            if (airport.type === 'closed') {
+                continue;
+            }
+            if (this.allowedAirports.indexOf(airport.type) === -1) {
+                continue;
+            }
+            const distance = GeoUtils.distanceBetweenCoordinates(this.config.lat, this.config.lon, airport.latitude_deg, airport.longitude_deg);
+            if (distance < min_distance) {
+                min_distance = distance;
+                nearest_airport = airport;
+            }
+        }
+        return {
+            airport: nearest_airport,
+            distance: min_distance
+        };
     }
 }
