@@ -1,7 +1,7 @@
 config:
   lastSeen: 1660314297909
   onGround: false
-  liveTrack: true
+  liveTrack: false
   squawk: ""
   lat: 38.056362
   lon: -26.893934

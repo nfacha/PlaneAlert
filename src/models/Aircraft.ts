@@ -66,6 +66,19 @@ export class Aircraft {
         const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
         if (data === null) {
             PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) returned no data`);
+            if (!this.config.onGround) {
+                let triggerTime = new Date();
+                triggerTime.setMinutes(triggerTime.getMinutes() + PlaneAlert.config.thresholds.signalLoss);
+                if (this.config.lastSeen < (new Date().getTime() - triggerTime.getTime())) {
+                    PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) has lost signal`);
+                    const nearestAirport = this.findNearestAirport();
+                    if (nearestAirport !== null) {
+                        PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
+                    } else {
+                        PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) has lost signal`);
+                    }
+                }
+            }
             this.config.liveTrack = false;
         } else {
             this.config.liveTrack = true;
@@ -82,7 +95,25 @@ export class Aircraft {
                 && data.barometricAltitude < PlaneAlert.config.thresholds.takeoff
                 && (!this.config.liveTrack || data.onGround)) {
                 //Plane takeoff
-                PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off`);
+                const nearestAirport = this.findNearestAirport();
+                if (nearestAirport !== null) {
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
+                } else {
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off`);
+                }
+            }
+            if (data.onGround
+                && data.barometricAltitude !== null
+                && data.barometricAltitude < PlaneAlert.config.thresholds.landing
+                && !data.onGround) {
+                PlaneAlert.log.info(`Plane ${this.icao} is landing`);
+                //Plane landing
+                const nearestAirport = this.findNearestAirport();
+                if (nearestAirport !== null) {
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) landed at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
+                } else {
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) landed`);
+                }
             }
         }
 
