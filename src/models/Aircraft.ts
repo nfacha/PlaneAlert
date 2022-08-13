@@ -4,7 +4,9 @@ import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
-import {Flight} from "../entities/Flight";
+import {Webhook} from "discord-webhook-node";
+import axios from "axios";
+import {Browser} from "puppeteer";
 
 export class Aircraft {
 
@@ -16,7 +18,7 @@ export class Aircraft {
     public refreshInterval: number;
 
     ///
-    private config = {
+    private meta = {
         lastSeen: 0,
         onGround: false,
         liveTrack: false,
@@ -27,6 +29,7 @@ export class Aircraft {
     }
 
     private notifications = {
+        includeScreenshots: false,
         discord: {
             enabled: false,
             webhooks: []
@@ -42,12 +45,15 @@ export class Aircraft {
         this.registration = aircraft.registration;
         this.allowedAirports = aircraft.allowedAirports;
         this.refreshInterval = aircraft.refreshInterval;
-        this.config.lastSeen = aircraft.config.lastSeen;
-        this.config.onGround = aircraft.config.onGround;
-        this.config.liveTrack = aircraft.config.liveTrack;
-        this.config.lat = aircraft.config.lat;
-        this.config.lon = aircraft.config.lon;
-        this.config.alt = aircraft.config.alt;
+        //
+        this.meta.lastSeen = aircraft.meta.lastSeen;
+        this.meta.onGround = aircraft.meta.onGround;
+        this.meta.liveTrack = aircraft.meta.liveTrack;
+        this.meta.lat = aircraft.meta.lat;
+        this.meta.lon = aircraft.meta.lon;
+        this.meta.alt = aircraft.meta.alt;
+        //
+        this.notifications = aircraft.notifications;
 
         setTimeout(() => {
             if (this.registration === "" || this.registration === null) {
@@ -77,8 +83,8 @@ export class Aircraft {
         const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
         if (data === null) {
             PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
-            if (!this.config.onGround) {
-                let triggerTime = new Date(this.config.lastSeen);
+            if (!this.meta.onGround) {
+                let triggerTime = new Date(this.meta.lastSeen);
                 triggerTime.setMinutes(triggerTime.getMinutes() + PlaneAlert.config.thresholds.signalLoss);
                 PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
                 if (triggerTime < new Date()) {
@@ -90,17 +96,17 @@ export class Aircraft {
                         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) has lost signal`);
                     }
                     this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
-                    this.config.onGround = true;
+                    this.meta.onGround = true;
                 }
             }
-            this.config.liveTrack = false;
+            this.meta.liveTrack = false;
         } else {
 
             //check time
             if (!data.onGround
                 && data.barometricAltitude !== null
                 && data.barometricAltitude < PlaneAlert.config.thresholds.takeoff
-                && this.config.onGround) {
+                && this.meta.onGround) {
                 //Plane takeoff
                 const nearestAirport = this.findNearestAirport();
                 if (nearestAirport !== null) {
@@ -113,7 +119,7 @@ export class Aircraft {
             if (data.onGround
                 && data.barometricAltitude !== null
                 && data.barometricAltitude < PlaneAlert.config.thresholds.landing
-                && !this.config.onGround) {
+                && !this.meta.onGround) {
                 PlaneAlert.log.info(`Plane ${this.icao} is landing`);
                 //Plane landing
                 const nearestAirport = this.findNearestAirport();
@@ -124,13 +130,13 @@ export class Aircraft {
                 }
                 this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
             }
-            this.config.liveTrack = true;
-            this.config.lastSeen = new Date().getTime();
-            this.config.onGround = data.onGround;
-            this.config.lat = data.latitude;
-            this.config.lon = data.longitude;
-            this.config.alt = data.barometricAltitude;
-            this.config.squawk = data.squawk;
+            this.meta.liveTrack = true;
+            this.meta.lastSeen = new Date().getTime();
+            this.meta.onGround = data.onGround;
+            this.meta.lat = data.latitude;
+            this.meta.lon = data.longitude;
+            this.meta.alt = data.barometricAltitude;
+            this.meta.squawk = data.squawk;
         }
 
         this.save();
@@ -138,10 +144,10 @@ export class Aircraft {
     }
 
     private findNearestAirport() {
-        if (this.config.lon === null || this.config.lat === null || PlaneAlert.airports === null) {
+        if (this.meta.lon === null || this.meta.lat === null || PlaneAlert.airports === null) {
             return null;
         }
-        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) searching for nearest airport of ${this.config.lat}/${this.config.lon}`);
+        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) searching for nearest airport of ${this.meta.lat}/${this.meta.lon}`);
         let min_distance = Number.MAX_SAFE_INTEGER;
         let nearest_airport = null;
         for (const airport of PlaneAlert.airports) {
@@ -151,7 +157,7 @@ export class Aircraft {
             if (this.allowedAirports.indexOf(airport.type) === -1) {
                 continue;
             }
-            const distance = GeoUtils.distanceBetweenCoordinates(this.config.lat, this.config.lon, airport.latitude_deg, airport.longitude_deg);
+            const distance = GeoUtils.distanceBetweenCoordinates(this.meta.lat, this.meta.lon, airport.latitude_deg, airport.longitude_deg);
             if (distance < min_distance) {
                 min_distance = distance;
                 nearest_airport = airport;
@@ -164,8 +170,75 @@ export class Aircraft {
     }
 
     private async triggerEvent(event: PlaneEvents, data: any = null) {
+        const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + this.icao;
+        let photoUrl = await this.getPhotoUrl()
+        return new Promise(async (resolve, reject) => {
+            PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
+            switch (event) {
+                case PlaneEvents.PLANE_TAKEOFF:
+                    if (this.notifications.discord.enabled) {
+                        let hasScreenshot = false;
+                        if(this.notifications.includeScreenshots){
+                            hasScreenshot = await this.takeScreenshot();
+                        }
+
+                        for (const discord of this.notifications.discord.webhooks) {
+                            const hook = new Webhook(discord);
+                            hook.setUsername(this.name);
+                            if (photoUrl !== null) {
+                                hook.setAvatar(photoUrl);
+                            }
+                            PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) sending discord notification to ${discord}`);
+                            if (hasScreenshot) {
+                                await hook.sendFile(`/tmp/${this.icao}.png`);
+                            }
+                            hook.send(`**${this.name}** (${this.registration}) took off from **${data.nearestAirport.name}** at ${new Date().toLocaleString()}\n${adsbExchangeLink}`);
+                        }
+                    }
+                    resolve(true);
+                    break;
+                case PlaneEvents.PLANE_LAND:
+
+                    resolve(true);
+                    break;
+            }
+        });
+    }
+
+    private async getPhotoUrl() {
+        let photoUrl = null;
+        if (this.icao !== null) {
+            const photoData = await axios.get('https://api.planespotters.net/pub/photos/hex/' + this.icao);
+            if (photoData.status === 200 && photoData.data.photos.length > 0) {
+                photoUrl = photoData.data.photos[0].thumbnail_large.src
+            }
+        }
+        return photoUrl;
+    }
+
+    private async takeScreenshot(): Promise<boolean> {
+        PlaneAlert.log.debug(`Getting plane screenshot for ${this.name} (${this.icao})`);
         return new Promise((resolve, reject) => {
-            PlaneAlert.log.warn(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
+            const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + this.icao + '&hideButtons&screenshot&hideSideBar';
+            const puppeteer = require('puppeteer');
+            puppeteer
+                .launch({
+                    defaultViewport: {
+                        width: 1920,
+                        height: 1080,
+                    },
+                })
+                .then(async (browser: Browser) => {
+                    const page = await browser.newPage();
+                    await page.goto(adsbExchangeLink, {waitUntil: 'networkidle2'});
+                    await page.screenshot({path: `/tmp/${this.icao}.png`});
+                    await browser.close();
+                    PlaneAlert.log.debug(`Plane screenshot for ${this.name} (${this.icao}) taken`);
+                    resolve(true);
+                }).catch((err: any) => {
+                PlaneAlert.log.error(`Error taking plane screenshot for ${this.name} (${this.icao}): ${err}`);
+                resolve(false);
+            });
         });
     }
 }

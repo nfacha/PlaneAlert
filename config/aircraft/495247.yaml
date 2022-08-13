@@ -1,18 +1,20 @@
-config:
-  lastSeen: 1660419833683
+meta:
+  lastSeen: 1660422620874
   onGround: false
   liveTrack: true
-  squawk: "2013"
-  lat: 51.437256
-  lon: -0.316599
-  alt: 4150
+  squawk: "6307"
+  lat: 49.008799
+  lon: 0.356767
+  alt: 35050
 notifications:
+  includeScreenshots: true
   discord:
-    enabled: false
-    webhooks: []
+    enabled: true
+    webhooks:
+      - https://discordapp.com/api/webhooks/1008076795624554677/DRMcT8QDEriIJG028lxDc1Ww9tvB0gAlEeTLqcyUcjseOuIMDKghDCf7BAj_r1TczV5b
 fileName: 495247.yaml
 name: Test
-icao: 4008B1
+icao: 40624F
 registration: D-AIJB
 allowedAirports:
   - large_airport
