@@ -75,6 +75,8 @@ export class Aircraft {
                         PlaneAlert.log.info("Found REG: " + this.registration + " for " + this.name);
                         this.save();
                     }
+                }).catch(err => {
+                    PlaneAlert.log.warn("Failed getting registration for " + this.name + ": " + err);
                 });
             }
             if (this.icao === "" || this.icao === null) {
@@ -93,11 +95,11 @@ export class Aircraft {
         PlaneAlert.log.info(`Checking aircraft ${this.name} (${this.icao})`);
         const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
         if (data === null) {
-            PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
+            // PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
             if (!this.meta.onGround) {
                 let triggerTime = new Date(this.meta.lastSeen);
                 triggerTime.setMinutes(triggerTime.getMinutes() + PlaneAlert.config.thresholds.signalLoss);
-                PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
+                // PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
                 if (triggerTime < new Date()) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) has lost signal`);
                     const nearestAirport = this.findNearestAirport();
@@ -112,7 +114,6 @@ export class Aircraft {
             }
             this.meta.liveTrack = false;
         } else {
-
             //check time
             if (!data.onGround
                 && data.barometricAltitude !== null
@@ -141,6 +142,8 @@ export class Aircraft {
                 }
                 this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
             }
+            PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) is ${data.onGround ? "on ground" : "in the air"} at ${data.latitude}, ${data.longitude} with altitude ${data.barometricAltitude}`);
+
             this.meta.liveTrack = true;
             this.meta.lastSeen = new Date().getTime();
             this.meta.onGround = data.onGround;
