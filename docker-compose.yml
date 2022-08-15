@@ -1,38 +1,11 @@
 version: '3'
 
 services:
-  postgres:
-    image: postgres
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    env_file:
-      - pg.env
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-  pgadmin:
-    image: dpage/pgadmin4
-    env_file:
-      - pgadmin.env
-    ports:
-      - "8888:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    depends_on:
-      - postgres
 
   planealert:
     build:
-      context: PlaneAlert
+      context: .
       dockerfile: Dockerfile
     volumes:
-      - ./:/app
-    depends_on:
-      - postgres
+      - ./config:/app/config
     restart: unless-stopped
-
-
-volumes:
-  postgres-data:
-  pgadmin-data:
