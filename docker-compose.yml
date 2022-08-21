@@ -3,9 +3,12 @@ version: '3'
 services:
 
   planealert:
+    init: true
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ./config:/app/config
     restart: unless-stopped
+    security_opt:
+      - seccomp=chrome.json
