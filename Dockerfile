@@ -1,7 +1,4 @@
 FROM node:17-buster
-RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser && mkdir -p /home/pptruser/Downloads && chown -R pptruser:pptruser /home/pptruser
-COPY --chown=pptruser:pptruser . /home/pptruser/app
-WORKDIR /home/pptruser/app
 RUN apt-get update \
     && apt-get install -y wget gnupg \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -10,6 +7,11 @@ RUN apt-get update \
     && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
+RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser && mkdir -p /home/pptruser/Downloads && chown -R pptruser:pptruser /home/pptruser
+COPY --chown=pptruser:pptruser . /home/pptruser/app
+WORKDIR /home/pptruser/app
+RUN mkdir -p /home/pptruser/app/config
+RUN chown -R pptruser:pptruser /home/pptruser/app/config
 USER pptruser
 RUN npm i
 #RUN npm run build

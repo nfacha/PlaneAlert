@@ -9,6 +9,7 @@ import axios from "axios";
 import {Browser} from "puppeteer";
 import {TwitterApi} from "twitter-api-v2";
 import TwitterUtils from "../utils/TwitterUtils";
+import {Common} from "../utils/common";
 
 export class Aircraft {
 
@@ -18,6 +19,7 @@ export class Aircraft {
     public registration: string;
     public allowedAirports: string[];
     public refreshInterval: number;
+    public callsign: string;
 
     ///
     private meta = {
@@ -65,6 +67,7 @@ export class Aircraft {
         this.meta.alt = aircraft.meta.alt;
         //
         this.notifications = aircraft.notifications;
+        this.callsign = aircraft.callsign;
 
         setTimeout(() => {
             if (this.registration === "" || this.registration === null) {
@@ -114,6 +117,9 @@ export class Aircraft {
             }
             this.meta.liveTrack = false;
         } else {
+            // set callsign
+            data.callsign
+
             //check time
             if (!data.onGround
                 && data.barometricAltitude !== null
@@ -190,35 +196,35 @@ export class Aircraft {
             PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
             switch (event) {
                 case PlaneEvents.PLANE_TAKEOFF:
-                    let hasScreenshot = false;
+                    let hasTakeoffScreenshot = false;
                     if(this.notifications.includeScreenshots){
-                        hasScreenshot = await this.takeScreenshot();
+                        hasTakeoffScreenshot = await Common.takeScreenshot(this.icao);
                     }
                     if (this.notifications.discord.enabled) {
 
                         for (const discord of this.notifications.discord.webhooks) {
                             const hook = new Webhook(discord);
-                            hook.setUsername(this.name);
+                            hook.setUsername(this.name + ' - ' + this.registration); // Example: 'Interesting Plane - C-GKQJ'
                             if (photoUrl !== null) {
                                 hook.setAvatar(photoUrl);
                             }
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) sending discord notification to ${discord}`);
-                            if (hasScreenshot) {
+                            if (hasTakeoffScreenshot) {
                                 await hook.sendFile(`/tmp/${this.icao}.png`);
                             }
-                            hook.send(`**${this.name}** (${this.registration}) took off from **${data.nearestAirport.name}** at ${new Date().toLocaleString()}\n${adsbExchangeLink}`);
+                            hook.send(`**${this.name}** flight ${this.callsign} (${this.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`);
                         }
                     }
                     if (this.notifications.twitter.enabled) {
                         for(const account of this.notifications.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
-                            if(hasScreenshot){
+                            if(hasTakeoffScreenshot){
                                 mediaId = await client.v1.uploadMedia(`/tmp/${this.icao}.png`);
                             }
                             await client.v2.tweet({
-                                text: `${this.name} (#${this.icao}) (#${this.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                media: hasScreenshot ? {media_ids: [mediaId]} : undefined
+                                text: `${this.name} (${this.callsign}) (#${this.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
                             })
                         }
                     }
@@ -241,31 +247,5 @@ export class Aircraft {
             }
         }
         return photoUrl;
-    }
-
-    private async takeScreenshot(): Promise<boolean> {
-        PlaneAlert.log.debug(`Getting plane screenshot for ${this.name} (${this.icao})`);
-        return new Promise((resolve, reject) => {
-            const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + this.icao + '&hideButtons&screenshot&hideSideBar';
-            const puppeteer = require('puppeteer');
-            puppeteer
-                .launch({
-                    defaultViewport: {
-                        width: 1920,
-                        height: 1080,
-                    },
-                })
-                .then(async (browser: Browser) => {
-                    const page = await browser.newPage();
-                    await page.goto(adsbExchangeLink, {waitUntil: 'networkidle2'});
-                    await page.screenshot({path: `/tmp/${this.icao}.png`});
-                    await browser.close();
-                    PlaneAlert.log.debug(`Plane screenshot for ${this.name} (${this.icao}) taken`);
-                    resolve(true);
-                }).catch((err: any) => {
-                PlaneAlert.log.error(`Error taking plane screenshot for ${this.name} (${this.icao}): ${err}`);
-                resolve(false);
-            });
-        });
     }
 }

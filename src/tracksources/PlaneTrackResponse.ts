@@ -9,4 +9,5 @@ export interface PlaneTrackResponse{
     verticalRate: number|null;
     squawk: number|null;
     emergencyStatus: any;
+    registration?: string|null;
 }
