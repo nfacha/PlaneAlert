@@ -23,7 +23,7 @@ export class EventUtils {
                         hasTakeoffScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
                     }
                     if (notificationSettings.discord.enabled) {
-                        let message = `**${notificationName}** flight ${aircraft.callsign} (${aircraft.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
+                        let message = `**${notificationName}**${aircraft.callsign ? " flight " + aircraft.callsign : ""} (${aircraft.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
 
                         for (const discord of notificationSettings.discord.webhooks) {
                             const hook = new WebhookClient({url: discord});
@@ -45,11 +45,15 @@ export class EventUtils {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
+                            if (client === null) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not get Twitter client`);
+                                continue;
+                            }
                             if (hasTakeoffScreenshot) {
                                 mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
                             await client.v2.tweet({
-                                text: `${notificationName} (${aircraft.callsign}) (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                 media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
                             })
                         }
@@ -62,7 +66,7 @@ export class EventUtils {
                         hasLandingScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
                     }
                     if (notificationSettings.discord.enabled) {
-                        let message = `**${notificationName}** flight ${aircraft.callsign} (${aircraft.registration}) landed at **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
+                        let message = `**${notificationName}**${aircraft.callsign ? " flight " + aircraft.callsign : ""} (${aircraft.registration}) landed at **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
 
                         for (const discord of notificationSettings.discord.webhooks) {
                             const hook = new WebhookClient({url: discord});
@@ -84,11 +88,15 @@ export class EventUtils {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
+                            if (client === null) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not get Twitter client`);
+                                continue;
+                            }
                             if (hasLandingScreenshot) {
                                 mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
                             await client.v2.tweet({
-                                text: `${notificationName} flight ${aircraft.callsign} (${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                 media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
                             })
                         }
