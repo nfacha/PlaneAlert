@@ -1,7 +1,7 @@
 import {PlaneAlert} from "../index";
-import puppeteer, {Browser} from "puppeteer";
+import {Browser} from "puppeteer";
 
-export class Common {
+export class ScreenshotUtils {
     public static async takeScreenshot(icao24: string | null): Promise<boolean> {
         PlaneAlert.log.debug(`Getting plane screenshot for ${icao24}`);
         return new Promise((resolve, reject) => {

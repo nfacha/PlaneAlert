@@ -1,7 +1,7 @@
 import {PlaneEvents} from "../enum/PlaneEvents";
 import {PlaneSpotterUtils} from "./PlaneSpotterUtils";
 import {PlaneAlert} from "../index";
-import {Common} from "./common";
+import {ScreenshotUtils} from "./ScreenshotUtils";
 import {WebhookClient} from "discord.js";
 import fs from "fs";
 import TwitterUtils from "./TwitterUtils";
@@ -20,7 +20,7 @@ export class EventUtils {
                 case PlaneEvents.PLANE_TAKEOFF:
                     let hasTakeoffScreenshot = false;
                     if (notificationSettings.includeScreenshots) {
-                        hasTakeoffScreenshot = await Common.takeScreenshot(aircraft.icao);
+                        hasTakeoffScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
                     }
                     if (notificationSettings.discord.enabled) {
                         let message = `**${notificationName}** flight ${aircraft.callsign} (${aircraft.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
