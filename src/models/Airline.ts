@@ -11,6 +11,7 @@ import {TwitterApi} from "twitter-api-v2";
 import TwitterUtils from "../utils/TwitterUtils";
 import {Aircraft} from "./Aircraft";
 import {Common} from "../utils/common";
+import {WebhookClient} from "discord.js";
 
 export interface AircraftMeta {
     icao: string | null;
@@ -27,6 +28,23 @@ export interface AircraftMeta {
     }
 }
 
+// Make a new type called webhook which is string[]
+export interface Notifications {
+    includeScreenshots: boolean,
+    discord: {
+        enabled: boolean,
+        webhooks: string[],
+    },
+    twitter: {
+        enabled: boolean,
+        accounts: [
+            {
+                accessToken: string,
+                accessSecret: string,
+            }
+        ]
+    }
+}
 export class Airline {
 
     public fileName: string;
@@ -38,7 +56,7 @@ export class Airline {
     ///
     public aircraft: AircraftMeta[] = [];
 
-    private notifications = {
+    private notifications: Notifications = {
         includeScreenshots: false,
         discord: {
             enabled: false,
@@ -250,18 +268,22 @@ export class Airline {
                         hasTakeoffScreenshot = await Common.takeScreenshot(aircraft.icao);
                     }
                     if (this.notifications.discord.enabled) {
+                        let message = `**${this.name}** flight ${aircraft.callsign} (${aircraft.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
 
                         for (const discord of this.notifications.discord.webhooks) {
-                            const hook = new Webhook(discord);
-                            hook.setUsername(this.name + ' - ' + aircraft.icao); // Example: 'AmazingAirlines - UA12345'
-                            if (photoUrl !== null) {
-                                hook.setAvatar(photoUrl);
-                            }
+                            const hook = new WebhookClient({url: discord});
                             PlaneAlert.log.debug(`Plane ${this.name} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasTakeoffScreenshot) {
-                                await hook.sendFile(`/tmp/${aircraft.icao}.png`);
+                                // Get RawFile of `/tmp/${aircraft.icao}.png`
+                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                await hook.send({
+                                    username: this.name + ' - ' + aircraft.registration,
+                                    avatarURL: photoUrl ? photoUrl : null,
+                                    content: message,
+                                    files: [rawFile]
+                                });
                             }
-                            hook.send(`**${this.name}** flight ${aircraft.callsign} (${aircraft.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`);
+
                         }
                     }
                     if (this.notifications.twitter.enabled) {
@@ -285,18 +307,22 @@ export class Airline {
                         hasLandingScreenshot = await Common.takeScreenshot(aircraft.icao);
                     }
                     if (this.notifications.discord.enabled) {
+                        let message = `**${this.name}** flight ${aircraft.callsign} (${aircraft.registration}) landed at **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
 
                         for (const discord of this.notifications.discord.webhooks) {
-                            const hook = new Webhook(discord);
-                            hook.setUsername(this.name + ' - ' + aircraft.icao); // Example: 'AmazingAirlines - UA12345'
-                            if (photoUrl !== null) {
-                                hook.setAvatar(photoUrl);
-                            }
+                            const hook = new WebhookClient({url: discord});
                             PlaneAlert.log.debug(`Plane ${this.name} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasLandingScreenshot) {
-                                await hook.sendFile(`/tmp/${aircraft.icao}.png`);
+                                // Get RawFile of `/tmp/${aircraft.icao}.png`
+                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                await hook.send({
+                                    username: this.name + ' - ' + aircraft.registration,
+                                    avatarURL: photoUrl ?  photoUrl : null,
+                                    content: message,
+                                    files: [rawFile]
+                                });
                             }
-                            hook.send(`**${this.name}** flight ${aircraft.callsign} (${aircraft.registration}) landed at **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`);
+
                         }
                     }
                     if (this.notifications.twitter.enabled) {

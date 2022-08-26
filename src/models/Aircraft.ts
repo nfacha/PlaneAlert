@@ -4,12 +4,10 @@ import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
-import {Webhook} from "discord-webhook-node";
 import axios from "axios";
-import {Browser} from "puppeteer";
-import {TwitterApi} from "twitter-api-v2";
 import TwitterUtils from "../utils/TwitterUtils";
 import {Common} from "../utils/common";
+import {WebhookClient} from "discord.js";
 
 export class Aircraft {
 
@@ -201,18 +199,22 @@ export class Aircraft {
                         hasTakeoffScreenshot = await Common.takeScreenshot(this.icao);
                     }
                     if (this.notifications.discord.enabled) {
+                        let message = `**${this.name}** flight ${this.callsign} (${this.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
 
                         for (const discord of this.notifications.discord.webhooks) {
-                            const hook = new Webhook(discord);
-                            hook.setUsername(this.name + ' - ' + this.registration); // Example: 'Interesting Plane - C-GKQJ'
-                            if (photoUrl !== null) {
-                                hook.setAvatar(photoUrl);
-                            }
+                            const hook = new WebhookClient({url: discord});
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) sending discord notification to ${discord}`);
                             if (hasTakeoffScreenshot) {
-                                await hook.sendFile(`/tmp/${this.icao}.png`);
+                                // Get RawFile of `/tmp/${aircraft.icao}.png`
+                                const rawFile = await fs.readFileSync(`/tmp/${this.icao}.png`);
+                                await hook.send({
+                                    username: this.name + ' - ' + this.registration,
+                                    avatarURL: photoUrl ? photoUrl : null,
+                                    content: message,
+                                    files: [rawFile]
+                                });
                             }
-                            hook.send(`**${this.name}** flight ${this.callsign} (${this.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`);
+
                         }
                     }
                     if (this.notifications.twitter.enabled) {
