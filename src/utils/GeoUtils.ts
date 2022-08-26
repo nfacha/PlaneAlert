@@ -49,10 +49,25 @@ export class GeoUtils {
                 nearest_airport = airport;
             }
         }
+
+        if (!nearest_airport) {
+            return null;
+        }
+
+        if (!nearest_airport.name) {
+            nearest_airport.name = nearest_airport.ident;
+        }
         return {
             airport: nearest_airport,
             distance: min_distance
         };
     }
 
+}
+
+interface NearestAirport {
+    airport: {
+
+    },
+    distance: number
 }

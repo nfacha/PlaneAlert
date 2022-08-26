@@ -169,7 +169,7 @@ export class Airline {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) has lost signal`);
                         const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
                         if (nearestAirport !== null) {
-                            PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
+                            PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) is near ${nearestAirport.airport!.name!} (${nearestAirport.airport!.ident!}) and has lost signal`);
                             // Check altitude
                             // @ts-ignore
                             if (this.aircraft[i].meta.alt != null && this.aircraft[i].meta.alt <= PlaneAlert.config.thresholds.landing) {
