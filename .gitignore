@@ -13,3 +13,5 @@ build/
 config/main.yaml
 config/aircraft/*.yaml
 config/aircraft/*.yaml.disabled
+config/airline/*.yaml
+config/airline/*.yaml.disabled
