@@ -4,17 +4,13 @@ import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
-import {Webhook} from "discord-webhook-node";
-import axios from "axios";
-import {Browser} from "puppeteer";
-import {TwitterApi} from "twitter-api-v2";
 import TwitterUtils from "../utils/TwitterUtils";
-import {Aircraft} from "./Aircraft";
 import {Common} from "../utils/common";
 import {WebhookClient} from "discord.js";
+import {PlaneSpotterUtils} from "../utils/PlaneSpotterUtils";
 
 export interface AircraftMeta {
-    icao: string | null;
+    icao: string;
     registration: string | null | undefined;
     callsign: string | null;
     meta: {
@@ -258,7 +254,7 @@ export class Airline {
 
     private async triggerEvent(event: PlaneEvents, data: any = null, aircraft: AircraftMeta) {
         const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + aircraft.icao;
-        let photoUrl = await this.getPhotoUrl(aircraft)
+        let photoUrl = await PlaneSpotterUtils.getPhotoUrl(aircraft.icao);
         return new Promise(async (resolve, reject) => {
             PlaneAlert.log.info(`Plane ${this.name} (${aircraft.icao}) triggered  ${event}`);
             switch (event) {
@@ -344,14 +340,4 @@ export class Airline {
         });
     }
 
-    private async getPhotoUrl(aircraft: AircraftMeta) {
-        let photoUrl = null;
-        if (aircraft.icao !== null) {
-            const photoData = await axios.get('https://api.planespotters.net/pub/photos/hex/' + aircraft.icao);
-            if (photoData.status === 200 && photoData.data.photos.length > 0) {
-                photoUrl = photoData.data.photos[0].thumbnail_large.src
-            }
-        }
-        return photoUrl;
-    }
 }

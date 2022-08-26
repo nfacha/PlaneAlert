@@ -4,10 +4,10 @@ import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
-import axios from "axios";
 import TwitterUtils from "../utils/TwitterUtils";
 import {Common} from "../utils/common";
 import {WebhookClient} from "discord.js";
+import {PlaneSpotterUtils} from "../utils/PlaneSpotterUtils";
 
 export class Aircraft {
 
@@ -189,7 +189,7 @@ export class Aircraft {
 
     private async triggerEvent(event: PlaneEvents, data: any = null) {
         const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + this.icao;
-        let photoUrl = await this.getPhotoUrl()
+        let photoUrl = await PlaneSpotterUtils.getPhotoUrl(this.icao);
         return new Promise(async (resolve, reject) => {
             PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
             switch (event) {
@@ -238,16 +238,5 @@ export class Aircraft {
                     break;
             }
         });
-    }
-
-    private async getPhotoUrl() {
-        let photoUrl = null;
-        if (this.icao !== null) {
-            const photoData = await axios.get('https://api.planespotters.net/pub/photos/hex/' + this.icao);
-            if (photoData.status === 200 && photoData.data.photos.length > 0) {
-                photoUrl = photoData.data.photos[0].thumbnail_large.src
-            }
-        }
-        return photoUrl;
     }
 }
