@@ -172,7 +172,7 @@ export class Airline {
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
                             // Check altitude
                             // @ts-ignore
-                            if (this.aircraft[i].meta.alt != null && this.aircraft[i].meta.alt <= PlaneAlert.config.thresholds.altitude) {
+                            if (this.aircraft[i].meta.alt != null && this.aircraft[i].meta.alt <= PlaneAlert.config.thresholds.landing) {
 
                                 PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) is at ${this.aircraft[i].meta.alt} ft and has lost signal. Suspected landing`);
                                 EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
@@ -194,10 +194,14 @@ export class Airline {
                     const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
+                        // Check altitude
+                        // @ts-ignore
+                        if (this.aircraft[i].meta.alt != null && this.aircraft[i].meta.alt <= PlaneAlert.config.thresholds.takeoff) {
+                            EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
+                        }
                     } else {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) took off`);
                     }
-                    EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
                 }
                 if (aircraft.onGround
                     && aircraft.barometricAltitude !== null
