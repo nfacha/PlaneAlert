@@ -1,4 +1,4 @@
-import {Logger} from "tslog";
+import {Logger, TLogLevelName} from "tslog";
 import * as fs from "fs";
 import {TrackSource} from "./enum/TrackSource";
 import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
@@ -10,10 +10,44 @@ import {Aircraft} from "./models/Aircraft";
 import YAML from "yaml";
 import {Airline} from "./models/Airline";
 
+interface Config {
+    tracksource: {
+        primary: TrackSource,
+        FachaDev: {
+            token: string | null,
+        },
+        vrs: {
+            base: string | null,
+            username: string | null,
+            password: string | null,
+        },
+        // Add more track sources here
+    },
+    refreshInterval: number,
+    thresholds: {
+        takeoff: number,
+        landing: number,
+        signalLoss: number,
+        landingNearestSuitableAirportDistance: number,
+    },
+    telemetry: {
+        sentry: {
+            dsn: string | null,
+        }
+    },
+    twitter: {
+        appToken: string | null,
+        appSecret: string | null,
+    },
+    log: {
+        level: string,
+    }
+}
+
 class Index {
     public log: Logger;
     public db: any;
-    public config: any;
+    public config: Config;
     public trackSource: OpenSkySource | any | undefined;
     public airports: any = [];
     public regions: any = [];
@@ -30,7 +64,7 @@ class Index {
         process.on('SIGUSR1', this.exitHandler.bind(this));
         process.on('SIGUSR2', this.exitHandler.bind(this));
         this.config = this.loadConfig();
-        this.log.setSettings({minLevel: this.config.log.level});
+        this.log.setSettings({minLevel: this.config.log.level as TLogLevelName});
         this.log.info("Log level set to " + this.config.log.level);
         if (this.config.telemetry.sentry.dsn !== null) {
             Sentry.init({
