@@ -19,6 +19,7 @@ export class ScreenshotUtils {
                     await page.setJavaScriptEnabled(true);
                     await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
                     await page.goto(adsbExchangeLink, {waitUntil: 'networkidle2'});
+                    await page.waitForSelector('#airplanePhoto');
                     await page.screenshot({path: `/tmp/${icao24}.png`});
                     await browser.close();
                     PlaneAlert.log.debug(`Plane screenshot for ${icao24} taken`);
