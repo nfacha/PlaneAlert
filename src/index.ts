@@ -94,6 +94,9 @@ class Index {
             for (const airline of this.airlines) {
                 airline.check();
             }
+            for (const type of this.types) {
+                type.check();
+            }
         }, 1000 * this.config.refreshInterval);
     }
 
@@ -140,8 +143,8 @@ class Index {
                 let file = files[i];
                 if (file.endsWith('.yaml')) {
                     this.log.info("Loading Type: " + file);
-                    let airline = new Airline(fs.readFileSync('./config/types/' + file, 'utf8'), file);
-                    this.airlines.push(airline);
+                    let type = new Type(fs.readFileSync('./config/types/' + file, 'utf8'), file);
+                    this.types.push(type);
                 }
             }
         }, 500);
