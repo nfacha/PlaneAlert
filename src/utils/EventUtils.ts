@@ -57,6 +57,42 @@ export class EventUtils {
                     resolve(true);
                     break;
                 case PlaneEvents.PLANE_LAND:
+                    let hasLandingScreenshot = false;
+                    if (notificationSettings.includeScreenshots) {
+                        hasLandingScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
+                    }
+                    if (notificationSettings.discord.enabled) {
+                        let message = `**${notificationName}** flight ${aircraft.callsign} (${aircraft.registration}) landed at **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
+
+                        for (const discord of notificationSettings.discord.webhooks) {
+                            const hook = new WebhookClient({url: discord});
+                            PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
+                            if (hasLandingScreenshot) {
+                                // Get RawFile of `/tmp/${aircraft.icao}.png`
+                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                await hook.send({
+                                    username: notificationName + ' - ' + aircraft.registration,
+                                    avatarURL: photoUrl ? photoUrl : undefined,
+                                    content: message,
+                                    files: [rawFile]
+                                });
+                            }
+
+                        }
+                    }
+                    if (notificationSettings.twitter.enabled) {
+                        for (const account of notificationSettings.twitter.accounts) {
+                            const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
+                            let mediaId = '';
+                            if (hasLandingScreenshot) {
+                                mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
+                            }
+                            await client.v2.tweet({
+                                text: `${notificationName} (${aircraft.callsign}) (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
+                            })
+                        }
+                    }
 
                     resolve(true);
                     break;
