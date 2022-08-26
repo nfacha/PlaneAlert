@@ -9,6 +9,7 @@ import {FachaDevSource} from "./tracksources/facha-dev/FachaDevSource";
 import {Aircraft} from "./models/Aircraft";
 import YAML from "yaml";
 import {Airline} from "./models/Airline";
+import {Type} from "./models/Type";
 
 interface Config {
     tracksource: {
@@ -54,6 +55,7 @@ class Index {
     public countries: any = [];
     public aircraft: any = [] //TODO
     public airlines: Airline[] = [];
+    public types: Type[] = [];
 
 
     constructor() {
@@ -118,12 +120,16 @@ class Index {
         }
         this.loadAircraft();
         this.loadAirlines()
+        this.loadTypes();
         setInterval(() => {
             for (const aircraft of this.aircraft) {
                 aircraft.check();
             }
             for (const airline of this.airlines) {
                 airline.check();
+            }
+            for (const type of this.types) {
+                type.check();
             }
         }, 1000 * this.config.refreshInterval);
     }
@@ -158,6 +164,21 @@ class Index {
                     this.log.info("Loading Airlines: " + file);
                     let airline = new Airline(fs.readFileSync('./config/airlines/' + file, 'utf8'), file);
                     this.airlines.push(airline);
+                }
+            }
+        }, 500);
+    }
+
+    private loadTypes() {
+        this.log.info("Loading Types");
+        const files = fs.readdirSync('./config/types');
+        setTimeout(() => {
+            for (const i in files) {
+                let file = files[i];
+                if (file.endsWith('.yaml')) {
+                    this.log.info("Loading Type: " + file);
+                    let type = new Type(fs.readFileSync('./config/types/' + file, 'utf8'), file);
+                    this.types.push(type);
                 }
             }
         }, 500);

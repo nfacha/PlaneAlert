@@ -37,38 +37,56 @@ export class FachaDevSource implements TrackSource {
 
 
                 let aircraft: PlaneTrackResponse[] = [];
-                if (!Array.isArray(state)) {
-                    aircraft.push(
-                        {
-                            icao24: state['icao24'],
-                            callsign: state['callsign'],
-                            longitude: state['lon'],
-                            latitude: state['lat'],
-                            barometricAltitude: state['baroAltitude'],
-                            onGround: state['onGround'],
-                            velocity: state['speed'],
-                            verticalRate: state['verticalRate'],
-                            squawk: state['squawk'],
-                            emergencyStatus: null,
-                        }
-                    )
-                } else {
-                    state.forEach((plane: any) => {
-                        aircraft.push({
-                            registration: plane['reg'],
-                            icao24: plane['icao'],
-                            callsign: plane['callsign'],
-                            longitude: plane['lon'],
-                            latitude: plane['lat'],
-                            barometricAltitude: plane['baroAltitude'],
-                            onGround: plane['onGround'],
-                            velocity: plane['speed'],
-                            verticalRate: plane['verticalRate'],
-                            squawk: plane['squawk'],
-                            emergencyStatus: null,
-                        })
+                state.forEach((plane: any) => {
+                    aircraft.push({
+                        registration: plane['reg'],
+                        icao24: plane['icao'],
+                        callsign: plane['callsign'],
+                        longitude: plane['lon'],
+                        latitude: plane['lat'],
+                        barometricAltitude: plane['baroAltitude'],
+                        onGround: plane['onGround'],
+                        velocity: plane['speed'],
+                        verticalRate: plane['verticalRate'],
+                        squawk: plane['squawk'],
+                        emergencyStatus: null,
                     })
+                })
+                resolve(aircraft);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    public static async getPlanesByType(type: string): Promise<PlaneTrackResponse[] | null> {
+        return new Promise<PlaneTrackResponse[] | null>(async (resolve, reject) => {
+            PlaneAlert.log.debug(`Getting planes and their statuses for ${type} from Api.Facha.Dev`);
+            try {
+                const rx = await axios.get(`https://api.facha.dev/v1/aircraft/live/type/${type}`, PlaneAlert.config.tracksource.FachaDev.token === null ? undefined : {headers: {'Authorization': `${PlaneAlert.config.tracksource.FachaDev.token}`}});
+                if (rx.status !== 200) {
+                    return null;
                 }
+                const state = rx.data;
+                if (state.error !== undefined) {
+                    resolve(null);
+                }
+                let aircraft: PlaneTrackResponse[] = [];
+                state.forEach((plane: any) => {
+                    aircraft.push({
+                        registration: plane['reg'],
+                        icao24: plane['icao'],
+                        callsign: plane['callsign'],
+                        longitude: plane['lon'],
+                        latitude: plane['lat'],
+                        barometricAltitude: plane['baroAltitude'],
+                        onGround: plane['onGround'],
+                        velocity: plane['speed'],
+                        verticalRate: plane['verticalRate'],
+                        squawk: plane['squawk'],
+                        emergencyStatus: null,
+                    })
+                });
                 resolve(aircraft);
             } catch (e) {
                 reject(e);
