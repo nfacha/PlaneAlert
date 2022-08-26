@@ -5,7 +5,7 @@ allowedAirports:
   - medium_airport
   - small_airport
 
-meta: []
+aircraft: []
 
 notifications:
   includeScreenshots: true
