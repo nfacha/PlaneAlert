@@ -3,10 +3,7 @@ version: '3.7'
 services:
 
   planealert:
-    init: true
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/nfacha/planealert:2.0
     volumes:
       - ./config:/home/pptruser/app/config
     restart: unless-stopped
