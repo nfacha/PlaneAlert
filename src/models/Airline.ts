@@ -170,7 +170,7 @@ export class Airline {
                     // PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
                     if (triggerTime < new Date()) {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) has lost signal`);
-                        const nearestAirport = this.findNearestAirport(this.aircraft[i]);
+                        const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i]);
                         if (nearestAirport !== null) {
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
                         } else {
@@ -188,7 +188,7 @@ export class Airline {
                     && aircraft.barometricAltitude < PlaneAlert.config.thresholds.takeoff
                     && this.aircraft[i].meta.onGround) {
                     //Plane takeoff
-                    const nearestAirport = this.findNearestAirport(this.aircraft[i]);
+                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i]);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
                     } else {
@@ -202,7 +202,7 @@ export class Airline {
                     && !this.aircraft[i].meta.onGround) {
                     PlaneAlert.log.info(`Plane ${this.aircraft[i].icao} is landing`);
                     //Plane landing
-                    const nearestAirport = this.findNearestAirport(this.aircraft[i]);
+                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i]);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) landed at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
                     } else {
@@ -226,31 +226,6 @@ export class Airline {
         }
     }
 
-    private findNearestAirport(aircraft: AircraftMeta) {
-        if (aircraft.meta.lon === null || aircraft.meta.lat === null || PlaneAlert.airports === null) {
-            return null;
-        }
-        PlaneAlert.log.debug(`Plane ${this.name} (${aircraft.icao}) searching for nearest airport of ${aircraft.meta.lat}/${aircraft.meta.lon}`);
-        let min_distance = Number.MAX_SAFE_INTEGER;
-        let nearest_airport = null;
-        for (const airport of PlaneAlert.airports) {
-            if (airport.type === 'closed') {
-                continue;
-            }
-            if (this.allowedAirports.indexOf(airport.type) === -1) {
-                continue;
-            }
-            const distance = GeoUtils.distanceBetweenCoordinates(aircraft.meta.lat, aircraft.meta.lon, airport.latitude_deg, airport.longitude_deg);
-            if (distance < min_distance) {
-                min_distance = distance;
-                nearest_airport = airport;
-            }
-        }
-        return {
-            airport: nearest_airport,
-            distance: min_distance
-        };
-    }
 
     private async triggerEvent(event: PlaneEvents, data: any = null, aircraft: AircraftMeta) {
         const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + aircraft.icao;

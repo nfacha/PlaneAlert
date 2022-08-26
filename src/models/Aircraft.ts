@@ -20,7 +20,7 @@ export class Aircraft {
     public callsign: string;
 
     ///
-    private meta = {
+    public meta = {
         lastSeen: 0,
         onGround: false,
         liveTrack: false,
@@ -103,7 +103,7 @@ export class Aircraft {
                 // PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
                 if (triggerTime < new Date()) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) has lost signal`);
-                    const nearestAirport = this.findNearestAirport();
+                    const nearestAirport = GeoUtils.findNearestAirport(this);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
                     } else {
@@ -124,7 +124,7 @@ export class Aircraft {
                 && data.barometricAltitude < PlaneAlert.config.thresholds.takeoff
                 && this.meta.onGround) {
                 //Plane takeoff
-                const nearestAirport = this.findNearestAirport();
+                const nearestAirport = GeoUtils.findNearestAirport(this);
                 if (nearestAirport !== null) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
                 } else {
@@ -138,7 +138,7 @@ export class Aircraft {
                 && !this.meta.onGround) {
                 PlaneAlert.log.info(`Plane ${this.icao} is landing`);
                 //Plane landing
-                const nearestAirport = this.findNearestAirport();
+                const nearestAirport = GeoUtils.findNearestAirport(this);
                 if (nearestAirport !== null) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) landed at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
                 } else {
@@ -161,31 +161,6 @@ export class Aircraft {
         // PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned data: ${JSON.stringify(data)}`);
     }
 
-    private findNearestAirport() {
-        if (this.meta.lon === null || this.meta.lat === null || PlaneAlert.airports === null) {
-            return null;
-        }
-        PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) searching for nearest airport of ${this.meta.lat}/${this.meta.lon}`);
-        let min_distance = Number.MAX_SAFE_INTEGER;
-        let nearest_airport = null;
-        for (const airport of PlaneAlert.airports) {
-            if (airport.type === 'closed') {
-                continue;
-            }
-            if (this.allowedAirports.indexOf(airport.type) === -1) {
-                continue;
-            }
-            const distance = GeoUtils.distanceBetweenCoordinates(this.meta.lat, this.meta.lon, airport.latitude_deg, airport.longitude_deg);
-            if (distance < min_distance) {
-                min_distance = distance;
-                nearest_airport = airport;
-            }
-        }
-        return {
-            airport: nearest_airport,
-            distance: min_distance
-        };
-    }
 
     private async triggerEvent(event: PlaneEvents, data: any = null) {
         const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + this.icao;
