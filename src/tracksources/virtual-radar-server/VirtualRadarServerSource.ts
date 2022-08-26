@@ -16,7 +16,7 @@ export class VirtualRadarServerSource implements TrackSource {
             return null;
         }
         const rx = await axios.get(`${PlaneAlert.config.tracksource.vrs.base}/AircraftList.json?fIcoQ=${icao24.toLowerCase()}`, {
-            auth: {
+            auth: (PlaneAlert.config.tracksource.vrs.username === null || PlaneAlert.config.tracksource.vrs.password === null) ? undefined : {
                 username: PlaneAlert.config.tracksource.vrs.username,
                 password: PlaneAlert.config.tracksource.vrs.password
             }
