@@ -46,9 +46,9 @@ export class EventUtils {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
                             if (hasTakeoffScreenshot) {
-                                mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
+                                mediaId = await client!.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
-                            await client.v2.tweet({
+                            await client!.v2.tweet({
                                 text: `${notificationName} (${aircraft.callsign}) (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                 media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
                             })
@@ -85,9 +85,9 @@ export class EventUtils {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
                             if (hasLandingScreenshot) {
-                                mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
+                                mediaId = await client!.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
-                            await client.v2.tweet({
+                            await client!.v2.tweet({
                                 text: `${notificationName} flight ${aircraft.callsign} (${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                 media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
                             })
