@@ -167,7 +167,7 @@ export class Airline {
                     // PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
                     if (triggerTime < new Date()) {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) has lost signal`);
-                        const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i]);
+                        const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
                         if (nearestAirport !== null) {
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
                         } else {
@@ -185,7 +185,7 @@ export class Airline {
                     && aircraft.barometricAltitude < PlaneAlert.config.thresholds.takeoff
                     && this.aircraft[i].meta.onGround) {
                     //Plane takeoff
-                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i]);
+                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
                     } else {
@@ -199,7 +199,7 @@ export class Airline {
                     && !this.aircraft[i].meta.onGround) {
                     PlaneAlert.log.info(`Plane ${this.aircraft[i].icao} is landing`);
                     //Plane landing
-                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i]);
+                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) landed at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
                     } else {

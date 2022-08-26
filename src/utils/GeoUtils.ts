@@ -20,7 +20,7 @@ export class GeoUtils {
         return value * Math.PI / 180;
     }
 
-    public static findNearestAirport(aircraft: Aircraft | AircraftMeta) {
+    public static findNearestAirport(aircraft: Aircraft | AircraftMeta, allowedAirports?: string[]) {
         if (aircraft.meta.lon === null || aircraft.meta.lat === null || PlaneAlert.airports === null) {
             return null;
         }
@@ -33,8 +33,12 @@ export class GeoUtils {
             }
             if (aircraft instanceof Aircraft) {
                 // We don't have supported airport types for aircraft we don't know beforehand
-                //Maybe in the future this can come form the API itself
+                // Maybe in the future this can come form the API itself
                 if (aircraft.allowedAirports.indexOf(airport.type) === -1) {
+                    continue;
+                }
+            } else {
+                if (allowedAirports !== undefined && allowedAirports.indexOf(airport.type) === -1) {
                     continue;
                 }
             }
