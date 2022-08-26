@@ -21,7 +21,7 @@ class Index {
     public countries: any = [];
     public twitterAccounts: TwitterAccount[] = [];
     public aircraft: any = [] //TODO
-    public airlines: Airline[] = []; // TODO
+    public airlines: Airline[] = [];
 
 
     constructor() {

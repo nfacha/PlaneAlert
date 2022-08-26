@@ -116,7 +116,7 @@ export class Aircraft {
             this.meta.liveTrack = false;
         } else {
             // set callsign
-            data.callsign
+            data.callsign = this.callsign;
 
             //check time
             if (!data.onGround
