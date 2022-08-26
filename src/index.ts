@@ -4,7 +4,6 @@ import {TrackSource} from "./enum/TrackSource";
 import {OpenSkySource} from "./tracksources/open-sky/OpenSkySource";
 import axios from "axios";
 import * as Sentry from '@sentry/node';
-import {TwitterAccount} from "./entities/TwitterAccount";
 import {VirtualRadarServerSource} from "./tracksources/virtual-radar-server/VirtualRadarServerSource";
 import {FachaDevSource} from "./tracksources/facha-dev/FachaDevSource";
 import {Aircraft} from "./models/Aircraft";
@@ -19,7 +18,6 @@ class Index {
     public airports: any = [];
     public regions: any = [];
     public countries: any = [];
-    public twitterAccounts: TwitterAccount[] = [];
     public aircraft: any = [] //TODO
     public airlines: Airline[] = [];
 
