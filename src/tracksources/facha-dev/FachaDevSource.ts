@@ -22,6 +22,46 @@ export class FachaDevSource implements TrackSource {
         });
     }
 
+    public static async getPlanesByOperator(operator: string): Promise<PlaneTrackResponse[] | null> {
+        return new Promise<PlaneTrackResponse[] | null>(async (resolve, reject) => {
+            PlaneAlert.log.debug(`Getting planes and their statuses for ${operator} from Api.Facha.Dev`);
+            try {
+                const rx = await axios.get(`https://api.facha.dev/v1/aircraft/live/operator/${operator}`, PlaneAlert.config.tracksource.FachaDev.token === null ? undefined : {headers: {'Authorization': `${PlaneAlert.config.tracksource.FachaDev.token}`}});
+                if (rx.status !== 200) {
+                    return null;
+                }
+                const state = rx.data;
+                if (state.error !== undefined) {
+                    resolve(null);
+                }
+                // Make sure that state is an array
+                if (!Array.isArray(state)) {
+                    resolve(null);
+                }
+
+                let aircraft: PlaneTrackResponse[] = [];
+                state.forEach((plane: any) => {
+                    aircraft.push({
+                        registration: plane['reg'],
+                        icao24: plane['icao'],
+                        callsign: plane['callsign'],
+                        longitude: plane['lon'],
+                        latitude: plane['lat'],
+                        barometricAltitude: plane['baroAltitude'],
+                        onGround: plane['onGround'],
+                        velocity: plane['speed'],
+                        verticalRate: plane['verticalRate'],
+                        squawk: plane['squawk'],
+                        emergencyStatus: null,
+                    })
+                })
+                resolve(aircraft);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
     public async getPlaneStatus(icao24: string): Promise<PlaneTrackResponse | null> {
         return new Promise<PlaneTrackResponse | null>(async (resolve, reject) => {
             PlaneAlert.log.debug(`Getting plane status for ${icao24} from Api.Facha.Dev`);

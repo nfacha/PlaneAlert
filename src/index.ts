@@ -9,6 +9,7 @@ import {VirtualRadarServerSource} from "./tracksources/virtual-radar-server/Virt
 import {FachaDevSource} from "./tracksources/facha-dev/FachaDevSource";
 import {Aircraft} from "./models/Aircraft";
 import YAML from "yaml";
+import {Airline} from "./models/Airline";
 
 class Index {
     public log: Logger;
@@ -20,6 +21,7 @@ class Index {
     public countries: any = [];
     public twitterAccounts: TwitterAccount[] = [];
     public aircraft: any = [] //TODO
+    public airlines: Airline[] = [];
 
 
     constructor() {
@@ -83,9 +85,13 @@ class Index {
                 break;
         }
         this.loadAircraft();
+        this.loadAirlines()
         setInterval(() => {
             for (const aircraft of this.aircraft) {
                 aircraft.check();
+            }
+            for (const airline of this.airlines) {
+                airline.check();
             }
         }, 1000 * this.config.refreshInterval);
     }
@@ -104,6 +110,22 @@ class Index {
                     this.log.info("Loading Aircraft: " + file);
                     let aircraft = new Aircraft(fs.readFileSync('./config/aircraft/' + file, 'utf8'), file);
                     this.aircraft.push(aircraft);
+
+                }
+            }
+        }, 500);
+    }
+
+    private loadAirlines() {
+        this.log.info("Loading Airlines");
+        const files = fs.readdirSync('./config/airlines');
+        setTimeout(() => {
+            for (const i in files) {
+                let file = files[i];
+                if (file.endsWith('.yaml')) {
+                    this.log.info("Loading Airlines: " + file);
+                    let airline = new Airline(fs.readFileSync('./config/airlines/' + file, 'utf8'), file);
+                    this.airlines.push(airline);
                 }
             }
         }, 500);
@@ -113,6 +135,9 @@ class Index {
         PlaneAlert.log.info("Cleaning up before exit");
         for (const aircraft of this.aircraft) {
             aircraft.save();
+        }
+        for (const airline of this.airlines) {
+            airline.save();
         }
     }
 }
