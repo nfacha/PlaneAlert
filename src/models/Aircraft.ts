@@ -103,7 +103,7 @@ export class Aircraft {
                     const nearestAirport = GeoUtils.findNearestAirport(this);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
-                        if (this.meta.alt != null && this.meta.alt <= PlaneAlert.config.thresholds.altitude) {
+                        if (this.meta.alt != null && this.meta.alt <= PlaneAlert.config.thresholds.landing) {
                             PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) is at ${this.meta.alt} ft and has lost signal. Suspected landing`);
                             EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this, null, {nearestAirport: nearestAirport?.airport});
                             this.meta.onGround = true;
@@ -129,6 +129,11 @@ export class Aircraft {
                 const nearestAirport = GeoUtils.findNearestAirport(this);
                 if (nearestAirport !== null) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
+                    // Check altitude
+                    // @ts-ignore
+                    if (this.aircraft[i].meta.alt != null && this.aircraft[i].meta.alt <= PlaneAlert.config.thresholds.takeoff) {
+                        EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, this, null, {nearestAirport: nearestAirport?.airport});
+                    }
                 } else {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off`);
                 }
