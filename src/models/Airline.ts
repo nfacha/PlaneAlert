@@ -274,7 +274,7 @@ export class Airline {
                                 const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
                                 await hook.send({
                                     username: this.name + ' - ' + aircraft.registration,
-                                    avatarURL: photoUrl ? photoUrl : null,
+                                    avatarURL: photoUrl ? photoUrl : undefined,
                                     content: message,
                                     files: [rawFile]
                                 });
@@ -313,7 +313,7 @@ export class Airline {
                                 const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
                                 await hook.send({
                                     username: this.name + ' - ' + aircraft.registration,
-                                    avatarURL: photoUrl ?  photoUrl : null,
+                                    avatarURL: photoUrl ? photoUrl : undefined,
                                     content: message,
                                     files: [rawFile]
                                 });

@@ -209,7 +209,7 @@ export class Aircraft {
                                 const rawFile = await fs.readFileSync(`/tmp/${this.icao}.png`);
                                 await hook.send({
                                     username: this.name + ' - ' + this.registration,
-                                    avatarURL: photoUrl ? photoUrl : null,
+                                    avatarURL: photoUrl ? photoUrl : undefined,
                                     content: message,
                                     files: [rawFile]
                                 });
