@@ -13,7 +13,7 @@ export class EventUtils {
         const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + aircraft.icao;
         let photoUrl = await PlaneSpotterUtils.getPhotoUrl(aircraft.icao);
         const notificationSettings = aircraft instanceof Aircraft ? aircraft.notifications : airline!.notifications;
-        const notificationName = aircraft instanceof Aircraft ? aircraft.name : aircraft.icao;
+        const notificationName = aircraft instanceof Aircraft ? aircraft.name : airline!.name;
         return new Promise(async (resolve, reject) => {
             PlaneAlert.log.info(`Plane ${notificationName} (${aircraft.icao}) triggered  ${event}`);
             switch (event) {
@@ -88,7 +88,7 @@ export class EventUtils {
                                 mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
                             await client.v2.tweet({
-                                text: `${notificationName} (${aircraft.callsign}) (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                text: `${notificationName} flight ${aircraft.callsign} (${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                 media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
                             })
                         }
