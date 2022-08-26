@@ -103,6 +103,11 @@ export class Aircraft {
                     const nearestAirport = GeoUtils.findNearestAirport(this);
                     if (nearestAirport !== null) {
                         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
+                        if (this.meta.alt != null && this.meta.alt <= PlaneAlert.config.thresholds.altitude) {
+                            PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) is at ${this.meta.alt} ft and has lost signal. Suspected landing`);
+                            EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this, null, {nearestAirport: nearestAirport?.airport});
+                            this.meta.onGround = true;
+                        }
                     } else {
                         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) has lost signal`);
                     }

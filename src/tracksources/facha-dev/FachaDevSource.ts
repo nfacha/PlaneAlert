@@ -34,27 +34,41 @@ export class FachaDevSource implements TrackSource {
                 if (state.error !== undefined) {
                     resolve(null);
                 }
-                // Make sure that state is an array
-                if (!Array.isArray(state)) {
-                    resolve(null);
-                }
+
 
                 let aircraft: PlaneTrackResponse[] = [];
-                state.forEach((plane: any) => {
-                    aircraft.push({
-                        registration: plane['reg'],
-                        icao24: plane['icao'],
-                        callsign: plane['callsign'],
-                        longitude: plane['lon'],
-                        latitude: plane['lat'],
-                        barometricAltitude: plane['baroAltitude'],
-                        onGround: plane['onGround'],
-                        velocity: plane['speed'],
-                        verticalRate: plane['verticalRate'],
-                        squawk: plane['squawk'],
-                        emergencyStatus: null,
+                if (!Array.isArray(state)) {
+                    aircraft.push(
+                        {
+                            icao24: state['icao24'],
+                            callsign: state['callsign'],
+                            longitude: state['lon'],
+                            latitude: state['lat'],
+                            barometricAltitude: state['baroAltitude'],
+                            onGround: state['onGround'],
+                            velocity: state['speed'],
+                            verticalRate: state['verticalRate'],
+                            squawk: state['squawk'],
+                            emergencyStatus: null,
+                        }
+                    )
+                } else {
+                    state.forEach((plane: any) => {
+                        aircraft.push({
+                            registration: plane['reg'],
+                            icao24: plane['icao'],
+                            callsign: plane['callsign'],
+                            longitude: plane['lon'],
+                            latitude: plane['lat'],
+                            barometricAltitude: plane['baroAltitude'],
+                            onGround: plane['onGround'],
+                            velocity: plane['speed'],
+                            verticalRate: plane['verticalRate'],
+                            squawk: plane['squawk'],
+                            emergencyStatus: null,
+                        })
                     })
-                })
+                }
                 resolve(aircraft);
             } catch (e) {
                 reject(e);
@@ -74,6 +88,8 @@ export class FachaDevSource implements TrackSource {
                 if (state.error !== undefined) {
                     resolve(null);
                 }
+
+
                 resolve({
                     icao24: icao24,
                     callsign: state['callsign'],

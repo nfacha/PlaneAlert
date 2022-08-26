@@ -170,11 +170,17 @@ export class Airline {
                         const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
                         if (nearestAirport !== null) {
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
+                            // Check altitude
+                            // @ts-ignore
+                            if (this.aircraft[i].meta.alt != null && this.aircraft[i].meta.alt <= PlaneAlert.config.thresholds.altitude) {
+
+                                PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) is at ${this.aircraft[i].meta.alt} ft and has lost signal. Suspected landing`);
+                                EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
+                                this.aircraft[i].meta.onGround = true;
+                            }
                         } else {
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) has lost signal`);
                         }
-                        EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
-                        this.aircraft[i].meta.onGround = true;
                     }
                 }
                 this.aircraft[i].meta.liveTrack = false;

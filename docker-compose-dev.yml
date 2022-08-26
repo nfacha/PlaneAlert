@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+
+  planealert:
+    build: '.'
+    volumes:
+      - ./config:/home/pptruser/app/config
+    restart: unless-stopped
+    security_opt:
+      - seccomp=chrome.json

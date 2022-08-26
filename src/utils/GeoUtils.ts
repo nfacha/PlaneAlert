@@ -25,7 +25,7 @@ export class GeoUtils {
             return null;
         }
         PlaneAlert.log.debug(`Plane ${this.name} (${aircraft.icao}) searching for nearest airport of ${aircraft.meta.lat}/${aircraft.meta.lon}`);
-        let min_distance = Number.MAX_SAFE_INTEGER;
+        let min_distance: number = PlaneAlert.config.thresholds.landingNearestSuitableAirportDistance;
         let nearest_airport = null;
         for (const airport of PlaneAlert.airports) {
             if (airport.type === 'closed') {
