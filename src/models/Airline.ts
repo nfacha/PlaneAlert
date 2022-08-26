@@ -4,10 +4,7 @@ import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
-import TwitterUtils from "../utils/TwitterUtils";
-import {Common} from "../utils/common";
-import {WebhookClient} from "discord.js";
-import {PlaneSpotterUtils} from "../utils/PlaneSpotterUtils";
+import {EventUtils} from "../utils/EventUtils";
 
 export interface AircraftMeta {
     icao: string;
@@ -52,7 +49,7 @@ export class Airline {
     ///
     public aircraft: AircraftMeta[] = [];
 
-    private notifications: Notifications = {
+    public notifications: Notifications = {
         includeScreenshots: false,
         discord: {
             enabled: false,
@@ -176,7 +173,7 @@ export class Airline {
                         } else {
                             PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) has lost signal`);
                         }
-                        this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport}, this.aircraft[i]);
+                        EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
                         this.aircraft[i].meta.onGround = true;
                     }
                 }
@@ -194,7 +191,7 @@ export class Airline {
                     } else {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) took off`);
                     }
-                    this.triggerEvent(PlaneEvents.PLANE_TAKEOFF, {nearestAirport: nearestAirport?.airport}, this.aircraft[i]);
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
                 }
                 if (aircraft.onGround
                     && aircraft.barometricAltitude !== null
@@ -208,7 +205,7 @@ export class Airline {
                     } else {
                         PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) landed`);
                     }
-                    this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport}, this.aircraft[i]);
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
                 }
                 PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) is ${aircraft.onGround ? "on ground" : "in the air"} at ${aircraft.latitude}, ${aircraft.longitude} with altitude ${aircraft.barometricAltitude}`);
 
@@ -224,95 +221,6 @@ export class Airline {
             this.save();
             // PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned data: ${JSON.stringify(data)}`);
         }
-    }
-
-
-    private async triggerEvent(event: PlaneEvents, data: any = null, aircraft: AircraftMeta) {
-        const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + aircraft.icao;
-        let photoUrl = await PlaneSpotterUtils.getPhotoUrl(aircraft.icao);
-        return new Promise(async (resolve, reject) => {
-            PlaneAlert.log.info(`Plane ${this.name} (${aircraft.icao}) triggered  ${event}`);
-            switch (event) {
-                case PlaneEvents.PLANE_TAKEOFF:
-                    let hasTakeoffScreenshot = false;
-                    if(this.notifications.includeScreenshots){
-                        hasTakeoffScreenshot = await Common.takeScreenshot(aircraft.icao);
-                    }
-                    if (this.notifications.discord.enabled) {
-                        let message = `**${this.name}** flight ${aircraft.callsign} (${aircraft.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
-
-                        for (const discord of this.notifications.discord.webhooks) {
-                            const hook = new WebhookClient({url: discord});
-                            PlaneAlert.log.debug(`Plane ${this.name} (${aircraft.icao}) sending discord notification to ${discord}`);
-                            if (hasTakeoffScreenshot) {
-                                // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
-                                await hook.send({
-                                    username: this.name + ' - ' + aircraft.registration,
-                                    avatarURL: photoUrl ? photoUrl : undefined,
-                                    content: message,
-                                    files: [rawFile]
-                                });
-                            }
-
-                        }
-                    }
-                    if (this.notifications.twitter.enabled) {
-                        for(const account of this.notifications.twitter.accounts) {
-                            const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
-                            let mediaId = '';
-                            if(hasTakeoffScreenshot){
-                                mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
-                            }
-                            await client.v2.tweet({
-                                text: `${this.name} (${aircraft.callsign}) (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
-                            })
-                        }
-                    }
-                    resolve(true);
-                    break;
-                case PlaneEvents.PLANE_LAND:
-                    let hasLandingScreenshot = false;
-                    if(this.notifications.includeScreenshots){
-                        hasLandingScreenshot = await Common.takeScreenshot(aircraft.icao);
-                    }
-                    if (this.notifications.discord.enabled) {
-                        let message = `**${this.name}** flight ${aircraft.callsign} (${aircraft.registration}) landed at **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
-
-                        for (const discord of this.notifications.discord.webhooks) {
-                            const hook = new WebhookClient({url: discord});
-                            PlaneAlert.log.debug(`Plane ${this.name} (${aircraft.icao}) sending discord notification to ${discord}`);
-                            if (hasLandingScreenshot) {
-                                // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
-                                await hook.send({
-                                    username: this.name + ' - ' + aircraft.registration,
-                                    avatarURL: photoUrl ? photoUrl : undefined,
-                                    content: message,
-                                    files: [rawFile]
-                                });
-                            }
-
-                        }
-                    }
-                    if (this.notifications.twitter.enabled) {
-                        for(const account of this.notifications.twitter.accounts) {
-                            const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
-                            let mediaId = '';
-                            if(hasLandingScreenshot){
-                                mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
-                            }
-                            await client.v2.tweet({
-                                text: `${this.name} (${aircraft.callsign}) (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
-                            })
-                        }
-                    }
-                    resolve(true);
-                    break;
-            }
-        });
     }
 
 }

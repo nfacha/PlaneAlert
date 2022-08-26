@@ -4,10 +4,7 @@ import {FachaDevSource} from '../tracksources/facha-dev/FachaDevSource';
 import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
-import TwitterUtils from "../utils/TwitterUtils";
-import {Common} from "../utils/common";
-import {WebhookClient} from "discord.js";
-import {PlaneSpotterUtils} from "../utils/PlaneSpotterUtils";
+import {EventUtils} from "../utils/EventUtils";
 
 export class Aircraft {
 
@@ -30,7 +27,7 @@ export class Aircraft {
         alt: 0
     }
 
-    private notifications = {
+    notifications = {
         includeScreenshots: false,
         discord: {
             enabled: false,
@@ -40,7 +37,7 @@ export class Aircraft {
             enabled: false,
             accounts: [
                 {
-                   accessToken: '',
+                    accessToken: '',
                      accessSecret: '',
                 }
             ]
@@ -109,7 +106,7 @@ export class Aircraft {
                     } else {
                         PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) has lost signal`);
                     }
-                    this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this, null, {nearestAirport: nearestAirport?.airport});
                     this.meta.onGround = true;
                 }
             }
@@ -130,7 +127,7 @@ export class Aircraft {
                 } else {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off`);
                 }
-                this.triggerEvent(PlaneEvents.PLANE_TAKEOFF, {nearestAirport: nearestAirport?.airport});
+                EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, this, null, {nearestAirport: nearestAirport?.airport});
             }
             if (data.onGround
                 && data.barometricAltitude !== null
@@ -144,7 +141,7 @@ export class Aircraft {
                 } else {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) landed`);
                 }
-                this.triggerEvent(PlaneEvents.PLANE_LAND, {nearestAirport: nearestAirport?.airport});
+                EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this, null, {nearestAirport: nearestAirport?.airport});
             }
             PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) is ${data.onGround ? "on ground" : "in the air"} at ${data.latitude}, ${data.longitude} with altitude ${data.barometricAltitude}`);
 
@@ -162,56 +159,4 @@ export class Aircraft {
     }
 
 
-    private async triggerEvent(event: PlaneEvents, data: any = null) {
-        const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + this.icao;
-        let photoUrl = await PlaneSpotterUtils.getPhotoUrl(this.icao);
-        return new Promise(async (resolve, reject) => {
-            PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) triggered  ${event}`);
-            switch (event) {
-                case PlaneEvents.PLANE_TAKEOFF:
-                    let hasTakeoffScreenshot = false;
-                    if(this.notifications.includeScreenshots){
-                        hasTakeoffScreenshot = await Common.takeScreenshot(this.icao);
-                    }
-                    if (this.notifications.discord.enabled) {
-                        let message = `**${this.name}** flight ${this.callsign} (${this.registration}) took off from **${data.nearestAirport.name}** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
-
-                        for (const discord of this.notifications.discord.webhooks) {
-                            const hook = new WebhookClient({url: discord});
-                            PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) sending discord notification to ${discord}`);
-                            if (hasTakeoffScreenshot) {
-                                // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = await fs.readFileSync(`/tmp/${this.icao}.png`);
-                                await hook.send({
-                                    username: this.name + ' - ' + this.registration,
-                                    avatarURL: photoUrl ? photoUrl : undefined,
-                                    content: message,
-                                    files: [rawFile]
-                                });
-                            }
-
-                        }
-                    }
-                    if (this.notifications.twitter.enabled) {
-                        for(const account of this.notifications.twitter.accounts) {
-                            const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
-                            let mediaId = '';
-                            if(hasTakeoffScreenshot){
-                                mediaId = await client.v1.uploadMedia(`/tmp/${this.icao}.png`);
-                            }
-                            await client.v2.tweet({
-                                text: `${this.name} (${this.callsign}) (#${this.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
-                            })
-                        }
-                    }
-                    resolve(true);
-                    break;
-                case PlaneEvents.PLANE_LAND:
-
-                    resolve(true);
-                    break;
-            }
-        });
-    }
 }
