@@ -5,6 +5,7 @@ import * as fs from "fs";
 import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
 import {EventUtils} from "../utils/EventUtils";
+import {PlaneUtils} from "../utils/PlaneUtils";
 
 export class Aircraft {
 
@@ -163,6 +164,7 @@ export class Aircraft {
             this.meta.lon = data.longitude;
             this.meta.alt = data.barometricAltitude;
             this.meta.squawk = data.squawk;
+            this.meta.emergency = PlaneUtils.isEmergencySquawk(data.squawk);
         }
 
         this.save();

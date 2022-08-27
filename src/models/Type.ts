@@ -6,6 +6,7 @@ import {GeoUtils} from "../utils/GeoUtils";
 import {PlaneEvents} from "../enum/PlaneEvents";
 import {EventUtils} from "../utils/EventUtils";
 import {AircraftMeta, Notifications} from "./Airline";
+import {PlaneUtils} from "../utils/PlaneUtils";
 
 
 export class Type {
@@ -58,7 +59,7 @@ export class Type {
                     lon: aircraft.meta.lon,
                     alt: aircraft.meta.alt,
                     squawk: aircraft.meta.squawk,
-                    emergency: false,
+                    emergency: PlaneUtils.isEmergencySquawk(aircraft.meta.squawk),
                 }
             });
         });
@@ -122,7 +123,7 @@ export class Type {
                         lon: data[i].longitude,
                         onGround: data[i].onGround,
                         squawk: data[i].squawk,
-                        emergency: false,
+                        emergency: PlaneUtils.isEmergencySquawk(data[i].squawk),
                     },
                 });
             }
@@ -188,7 +189,7 @@ export class Type {
                 this.aircraft[i].meta.lon = aircraft.longitude;
                 this.aircraft[i].meta.alt = aircraft.barometricAltitude;
                 this.aircraft[i].meta.squawk = aircraft.squawk;
-                this.aircraft[i].meta.emergency = false;
+                this.aircraft[i].meta.emergency = PlaneUtils.isEmergencySquawk(aircraft.squawk);
             }
 
             this.save();

@@ -1,6 +1,9 @@
 export class PlaneUtils {
-    public static isEmergencySquawk(squawk: string): boolean {
-        return ['7500', '7600', '7700'].includes(squawk)
+    public static isEmergencySquawk(squawk: number | null): boolean {
+        if (squawk === null) {
+            return false;
+        }
+        return [7500, 7600, 7700].includes(squawk)
     }
 
     public static getEmergencyType(squawk: string): string {
