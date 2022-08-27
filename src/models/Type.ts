@@ -58,6 +58,7 @@ export class Type {
                     lon: aircraft.meta.lon,
                     alt: aircraft.meta.alt,
                     squawk: aircraft.meta.squawk,
+                    emergency: false,
                 }
            });
         });
@@ -121,6 +122,7 @@ export class Type {
                         lon: data[i].longitude,
                         onGround: data[i].onGround,
                         squawk: data[i].squawk,
+                        emergency: false,
                     },
                 });
             }
@@ -186,6 +188,7 @@ export class Type {
                 this.aircraft[i].meta.lon = aircraft.longitude;
                 this.aircraft[i].meta.alt = aircraft.barometricAltitude;
                 this.aircraft[i].meta.squawk = aircraft.squawk;
+                this.aircraft[i].meta.emergency = false;
             }
 
             this.save();
