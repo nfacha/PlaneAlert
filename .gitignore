@@ -17,3 +17,4 @@ config/airlines/*.yaml
 config/airlines/*.yaml.disabled
 config/types/*.yaml
 config/types/*.yaml.disabled
+config-server/*
