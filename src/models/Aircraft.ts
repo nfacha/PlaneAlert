@@ -39,7 +39,7 @@ export class Aircraft {
             accounts: [
                 {
                     accessToken: '',
-                     accessSecret: '',
+                    accessSecret: '',
                 }
             ]
         }

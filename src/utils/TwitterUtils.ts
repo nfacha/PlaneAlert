@@ -2,7 +2,7 @@ import {TwitterApi} from "twitter-api-v2";
 import {PlaneAlert} from "../index";
 
 export default class TwitterUtils {
-    public static getTwitterClient(token:string, secret:string){
+    public static getTwitterClient(token: string, secret: string) {
         if (PlaneAlert.config.twitter.appToken === null || PlaneAlert.config.twitter.appSecret === null) {
             return null;
         }

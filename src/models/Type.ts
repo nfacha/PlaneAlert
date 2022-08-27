@@ -46,7 +46,7 @@ export class Type {
         this.refreshInterval = type.refreshInterval;
         //
         type.aircraft.forEach((aircraft: AircraftMeta) => {
-           this.aircraft.push({
+            this.aircraft.push({
                 icao: aircraft.icao,
                 registration: aircraft.registration,
                 callsign: aircraft.callsign,
@@ -60,7 +60,7 @@ export class Type {
                     squawk: aircraft.meta.squawk,
                     emergency: false,
                 }
-           });
+            });
         });
         //
         this.notifications = type.notifications;

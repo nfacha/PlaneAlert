@@ -66,8 +66,6 @@ export class GeoUtils {
 }
 
 interface NearestAirport {
-    airport: {
-
-    },
+    airport: {},
     distance: number
 }

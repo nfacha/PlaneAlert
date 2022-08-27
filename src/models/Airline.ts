@@ -39,6 +39,7 @@ export interface Notifications {
         ]
     }
 }
+
 export class Airline {
 
     public fileName: string;
@@ -77,7 +78,7 @@ export class Airline {
         this.refreshInterval = airline.refreshInterval;
         //
         airline.aircraft.forEach((aircraft: AircraftMeta) => {
-           this.aircraft.push({
+            this.aircraft.push({
                 icao: aircraft.icao,
                 registration: aircraft.registration,
                 callsign: aircraft.callsign,
@@ -91,7 +92,7 @@ export class Airline {
                     squawk: aircraft.meta.squawk,
                     emergency: false,
                 }
-           });
+            });
         });
         //
         this.notifications = airline.notifications;
