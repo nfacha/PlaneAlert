@@ -17,4 +17,6 @@ config/airlines/*.yaml
 config/airlines/*.yaml.disabled
 config/types/*.yaml
 config/types/*.yaml.disabled
+config/squawk/*.yaml
+config/squawk/*.yaml.disabled
 config-server/*

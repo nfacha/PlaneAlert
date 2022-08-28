@@ -10,6 +10,7 @@ import {Aircraft} from "./models/Aircraft";
 import YAML from "yaml";
 import {Airline} from "./models/Airline";
 import {Type} from "./models/Type";
+import {Squawk} from "./models/Squawk";
 
 interface Config {
     tracksource: {
@@ -56,6 +57,7 @@ class Index {
     public aircraft: any = [] //TODO
     public airlines: Airline[] = [];
     public types: Type[] = [];
+    public squawks: Squawk[] = [];
 
 
     constructor() {
@@ -121,6 +123,7 @@ class Index {
         this.loadAircraft();
         this.loadAirlines()
         this.loadTypes();
+        this.loadSquawks();
         setInterval(() => {
             for (const aircraft of this.aircraft) {
                 aircraft.check();
@@ -130,6 +133,9 @@ class Index {
             }
             for (const type of this.types) {
                 type.check();
+            }
+            for (const squawk of this.squawks) {
+                squawk.check();
             }
         }, 1000 * this.config.refreshInterval);
     }
@@ -179,6 +185,21 @@ class Index {
                     this.log.info("Loading Type: " + file);
                     let type = new Type(fs.readFileSync('./config/types/' + file, 'utf8'), file);
                     this.types.push(type);
+                }
+            }
+        }, 500);
+    }
+
+    private loadSquawks() {
+        this.log.info("Loading Squawks");
+        const files = fs.readdirSync('./config/squawk');
+        setTimeout(() => {
+            for (const i in files) {
+                let file = files[i];
+                if (file.endsWith('.yaml')) {
+                    this.log.info("Loading Squawk: " + file);
+                    let squawk = new Squawk(fs.readFileSync('./config/squawk/' + file, 'utf8'), file);
+                    this.squawks.push(squawk);
                 }
             }
         }, 500);

@@ -1,0 +1,16 @@
+name: General Emergency
+squawk: 7700
+
+aircraft: []
+
+notifications:
+  includeScreenshots: true
+  discord:
+    enabled: false
+    webhooks: []
+  twitter:
+    enabled: false
+    accounts:
+      - username: PlaneAlert
+        accessToken: ""
+        accessSecret: ""
