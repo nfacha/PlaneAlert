@@ -45,8 +45,3 @@ another source is selected
    folders will contain an example file, to add a track of that type you just need to copy that file over and adjust its
    settings as needed
 4. Run `docker-compose up -d` to start the services
-
-### Inspiration
-
-This was inspired by wesmorgan1's Reddit
-post: https://www.reddit.com/r/ADSB/comments/rutot0/python3_script_to_profile_dump1090_output_and/
