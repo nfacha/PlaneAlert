@@ -121,7 +121,11 @@ export class Aircraft {
         } else {
             // set callsign
             this.callsign = data.callsign;
-
+            //no emergency before, emergency now
+            if (!this.meta.emergency && PlaneUtils.isEmergencySquawk(data.squawk)) {
+                PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) has emergency of type ${PlaneUtils.getEmergencyType(data.squawk)}`);
+                EventUtils.triggerEvent(PlaneEvents.PLANE_EMERGENCY, this, null, {squawk: data.squawk});
+            }
             //check time
             if (!data.onGround
                 && data.barometricAltitude !== null

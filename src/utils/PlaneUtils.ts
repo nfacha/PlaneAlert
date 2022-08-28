@@ -6,13 +6,13 @@ export class PlaneUtils {
         return [7500, 7600, 7700].includes(squawk)
     }
 
-    public static getEmergencyType(squawk: string): string {
+    public static getEmergencyType(squawk: number | null): string {
         switch (squawk) {
-            case '7500':
+            case 7500:
                 return 'Hijack';
-            case '7600':
+            case 7600:
                 return 'Radio Failure';
-            case '7700':
+            case 7700:
                 return 'General Emergency';
             default:
                 return '';

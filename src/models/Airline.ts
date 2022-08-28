@@ -190,6 +190,11 @@ export class Airline {
                 }
                 this.aircraft[i].meta.liveTrack = false;
             } else {
+                //no emergency before, emergency now
+                if (!this.aircraft[i].meta.emergency && PlaneUtils.isEmergencySquawk(aircraft.squawk)) {
+                    PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) has emergency of type ${PlaneUtils.getEmergencyType(aircraft.squawk)}`);
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_EMERGENCY, this.aircraft[i], this, {squawk: aircraft.squawk});
+                }
                 //check time
                 if (!aircraft.onGround
                     && aircraft.barometricAltitude !== null
