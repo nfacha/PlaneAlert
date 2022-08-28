@@ -18,7 +18,7 @@
     "url": "git+https://github.com/nfacha/PlaneAlert.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "bugs": {
     "url": "https://github.com/nfacha/PlaneAlert/issues"
   },
