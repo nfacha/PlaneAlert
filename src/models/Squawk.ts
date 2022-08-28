@@ -106,9 +106,7 @@ export class Squawk {
             const aircraft = this.aircraft.find(a => a.icao === element.icao24);
             if (aircraft === undefined) {
                 PlaneAlert.log.debug("New plane " + element.icao24 + " for " + element.callsign);
-                // Push new plane
-                // I think this is really a bad way to do this. I am just too tired to figure out a better way.
-                this.aircraft.push({
+                const aircraft = {
                     icao: element.icao24,
                     registration: element.registration,
                     callsign: element.callsign,
@@ -122,7 +120,15 @@ export class Squawk {
                         squawk: element.squawk,
                         emergency: PlaneUtils.isEmergencySquawk(element.squawk),
                     },
-                });
+                };
+                //no emergency before, emergency now
+                if (PlaneUtils.isEmergencySquawk(aircraft.meta.squawk)) {
+                    PlaneAlert.log.info(`Plane ${this.name} (${aircraft.icao}) has emergency of type ${PlaneUtils.getEmergencyType(aircraft.meta.squawk)}`);
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_EMERGENCY, aircraft, null, {squawk: aircraft.meta.squawk});
+                }
+                // Push new plane
+                // I think this is really a bad way to do this. I am just too tired to figure out a better way.
+                this.aircraft.push(aircraft);
             }
         }
 
