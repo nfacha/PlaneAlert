@@ -22,7 +22,7 @@ export class FachaDevSource implements TrackSource {
         });
     }
 
-    public static async getPlanesByOperator(operator: string): Promise<PlaneTrackResponse[] | null> {
+    public async getPlanesByOperator(operator: string): Promise<PlaneTrackResponse[] | null> {
         return new Promise<PlaneTrackResponse[] | null>(async (resolve, reject) => {
             PlaneAlert.log.debug(`Getting planes and their statuses for ${operator} from Api.Facha.Dev`);
             try {
@@ -59,7 +59,7 @@ export class FachaDevSource implements TrackSource {
         });
     }
 
-    public static async getPlanesByType(type: string): Promise<PlaneTrackResponse[] | null> {
+    public async getPlanesByType(type: string): Promise<PlaneTrackResponse[] | null> {
         return new Promise<PlaneTrackResponse[] | null>(async (resolve, reject) => {
             PlaneAlert.log.debug(`Getting planes and their statuses for ${type} from Api.Facha.Dev`);
             try {
@@ -94,7 +94,7 @@ export class FachaDevSource implements TrackSource {
         });
     }
 
-    public static async getPlanesBySquawk(squawk: number): Promise<PlaneTrackResponse[] | null> {
+    public async getPlanesBySquawk(squawk: number): Promise<PlaneTrackResponse[] | null> {
         return new Promise<PlaneTrackResponse[] | null>(async (resolve, reject) => {
             PlaneAlert.log.debug(`Getting planes and their statuses for ${squawk} from Api.Facha.Dev`);
             try {

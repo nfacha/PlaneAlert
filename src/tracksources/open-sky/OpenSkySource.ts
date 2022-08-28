@@ -26,4 +26,25 @@ export class OpenSkySource implements TrackSource {
             emergencyStatus: null,
         }
     }
+
+    getPlanesBySquawk(squawk: number): Promise<PlaneTrackResponse[] | null> {
+        return new Promise((resolve, reject) => {
+            PlaneAlert.log.error('OpenSky TrackSource does not support squawk lookup at this time');
+            resolve(null);
+        });
+    }
+
+    getPlanesByType(type: string): Promise<PlaneTrackResponse[] | null> {
+        return new Promise((resolve, reject) => {
+            PlaneAlert.log.error('OpenSky TrackSource does not support type lookup at this time');
+            resolve(null);
+        });
+    }
+
+    getPlanesByOperator(operator: string): Promise<PlaneTrackResponse[] | null> {
+        return new Promise((resolve, reject) => {
+            PlaneAlert.log.error('OpenSky TrackSource does not support operator lookup at this time');
+            resolve(null);
+        });
+    }
 }

@@ -94,7 +94,7 @@ export class Squawk {
 
     public async check() {
         PlaneAlert.log.debug("Checking type " + this.name);
-        const data = await FachaDevSource.getPlanesBySquawk(this.squawk);
+        const data = await PlaneAlert.trackSource.getPlanesBySquawk(this.squawk);
 
         if (data === null) {
             PlaneAlert.log.warn("No data for " + this.name);
@@ -134,7 +134,7 @@ export class Squawk {
 
         for (const element of this.aircraft) {
             PlaneAlert.log.info(`Checking aircraft ${this.name} (${element.icao})`);
-            const aircraft = data.find(a => a.icao24 === element.icao);
+            const aircraft = data.find((a: { icao24: string; }) => a.icao24 === element.icao);
             if (aircraft !== undefined) {
                 //no emergency before, emergency now
                 if (!element.meta.emergency && PlaneUtils.isEmergencySquawk(aircraft.squawk)) {

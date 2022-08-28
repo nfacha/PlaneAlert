@@ -97,7 +97,7 @@ export class Type {
 
     public async check() {
         PlaneAlert.log.debug("Checking type " + this.name);
-        const data = await FachaDevSource.getPlanesByType(this.icao);
+        const data = await PlaneAlert.trackSource.getPlanesByType(this.icao);
 
         if (data === null) {
             PlaneAlert.log.warn("No data for " + this.name);
@@ -131,7 +131,7 @@ export class Type {
 
         for (const element of this.aircraft) {
             PlaneAlert.log.info(`Checking aircraft ${this.name} (${element.icao})`);
-            const aircraft = data.find(a => a.icao24 === element.icao);
+            const aircraft = data.find((a: { icao24: string; }) => a.icao24 === element.icao);
             if (aircraft === undefined) {
                 // PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
                 if (!element.meta.onGround) {
