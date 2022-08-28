@@ -7,6 +7,7 @@ import fs from "fs";
 import TwitterUtils from "./TwitterUtils";
 import {Aircraft} from "../models/Aircraft";
 import {AircraftMeta, Airline} from "../models/Airline";
+import {PlaneUtils} from "./PlaneUtils";
 
 export class EventUtils {
     public static async triggerEvent(event: PlaneEvents, aircraft: Aircraft | AircraftMeta, airline: Airline | null = null, data: any = null) {
@@ -98,6 +99,50 @@ export class EventUtils {
                             await client.v2.tweet({
                                 text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                 media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
+                            })
+                        }
+                    }
+
+                    resolve(true);
+                    break;
+                case PlaneEvents.PLANE_EMERGENCY:
+                    let hasEmergencyScreenshot = false;
+                    if (notificationSettings.includeScreenshots) {
+                        hasEmergencyScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
+                    }
+                    if (notificationSettings.discord.enabled) {
+                        let message = `**${notificationName}**${aircraft.callsign ? " flight " + aircraft.callsign : ""} (${aircraft.registration}) is squawking ${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) ** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
+
+                        for (const discord of notificationSettings.discord.webhooks) {
+                            const hook = new WebhookClient({url: discord});
+                            PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
+                            if (hasEmergencyScreenshot) {
+                                // Get RawFile of `/tmp/${aircraft.icao}.png`
+                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                await hook.send({
+                                    username: notificationName + ' - ' + aircraft.registration,
+                                    avatarURL: photoUrl ? photoUrl : undefined,
+                                    content: message,
+                                    files: [rawFile]
+                                });
+                            }
+
+                        }
+                    }
+                    if (notificationSettings.twitter.enabled) {
+                        for (const account of notificationSettings.twitter.accounts) {
+                            const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
+                            let mediaId = '';
+                            if (client === null) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not get Twitter client`);
+                                continue;
+                            }
+                            if (hasEmergencyScreenshot) {
+                                mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
+                            }
+                            await client.v2.tweet({
+                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) is squawking ${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                media: hasEmergencyScreenshot ? {media_ids: [mediaId]} : undefined
                             })
                         }
                     }
