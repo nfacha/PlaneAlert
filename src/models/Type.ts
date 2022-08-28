@@ -104,97 +104,97 @@ export class Type {
             return;
         }
         PlaneAlert.log.debug("Got " + data.length + " planes for " + this.name);
-        for (let i = 0; i < data.length; i++) {
+        for (const element of data) {
             // Check to see if this is a new plane
-            const aircraft = this.aircraft.find(a => a.icao === data[i].icao24);
+            const aircraft = this.aircraft.find(a => a.icao === element.icao24);
             if (aircraft === undefined) {
-                PlaneAlert.log.debug("New plane " + data[i].icao24 + " for " + data[i].callsign);
+                PlaneAlert.log.debug("New plane " + element.icao24 + " for " + element.callsign);
                 // Push new plane
                 // I think this is really a bad way to do this. I am just too tired to figure out a better way.
                 this.aircraft.push({
-                    icao: data[i].icao24,
-                    registration: data[i].registration,
-                    callsign: data[i].callsign,
+                    icao: element.icao24,
+                    registration: element.registration,
+                    callsign: element.callsign,
                     meta: {
-                        alt: data[i].barometricAltitude,
+                        alt: element.barometricAltitude,
                         lastSeen: Date.now(),
-                        lat: data[i].latitude,
+                        lat: element.latitude,
                         liveTrack: true,
-                        lon: data[i].longitude,
-                        onGround: data[i].onGround,
-                        squawk: data[i].squawk,
-                        emergency: PlaneUtils.isEmergencySquawk(data[i].squawk),
+                        lon: element.longitude,
+                        onGround: element.onGround,
+                        squawk: element.squawk,
+                        emergency: PlaneUtils.isEmergencySquawk(element.squawk),
                     },
                 });
             }
         }
 
-        for (let i = 0; i < this.aircraft.length; i++) {
-            PlaneAlert.log.info(`Checking aircraft ${this.name} (${this.aircraft[i].icao})`);
-            const aircraft = data.find(a => a.icao24 === this.aircraft[i].icao);
+        for (const element of this.aircraft) {
+            PlaneAlert.log.info(`Checking aircraft ${this.name} (${element.icao})`);
+            const aircraft = data.find(a => a.icao24 === element.icao);
             if (aircraft === undefined) {
                 // PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
-                if (!this.aircraft[i].meta.onGround) {
-                    let triggerTime = new Date(this.aircraft[i].meta.lastSeen);
+                if (!element.meta.onGround) {
+                    let triggerTime = new Date(element.meta.lastSeen);
                     triggerTime.setMinutes(triggerTime.getMinutes() + PlaneAlert.config.thresholds.signalLoss);
                     // PlaneAlert.log.debug(`Trigger time for ${this.icao} is ${triggerTime.toTimeString()}`);
                     if (triggerTime < new Date()) {
-                        PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) has lost signal`);
-                        const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
+                        PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) has lost signal`);
+                        const nearestAirport = GeoUtils.findNearestAirport(element, this.allowedAirports);
                         if (nearestAirport !== null) {
-                            PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
+                            PlaneAlert.log.debug(`Plane ${this.name} (${element.icao}) is near ${nearestAirport.airport.name} (${nearestAirport.airport.ident}) and has lost signal`);
                         } else {
-                            PlaneAlert.log.debug(`Plane ${this.name} (${this.aircraft[i].icao}) has lost signal`);
+                            PlaneAlert.log.debug(`Plane ${this.name} (${element.icao}) has lost signal`);
                         }
-                        EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
-                        this.aircraft[i].meta.onGround = true;
+                        EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, element, this, {nearestAirport: nearestAirport?.airport});
+                        element.meta.onGround = true;
                     }
                 }
-                this.aircraft[i].meta.liveTrack = false;
+                element.meta.liveTrack = false;
             } else {
                 //no emergency before, emergency now
-                if (!this.aircraft[i].meta.emergency && PlaneUtils.isEmergencySquawk(aircraft.squawk)) {
-                    PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) has emergency of type ${PlaneUtils.getEmergencyType(aircraft.squawk)}`);
-                    EventUtils.triggerEvent(PlaneEvents.PLANE_EMERGENCY, this.aircraft[i], this, {squawk: aircraft.squawk});
+                if (!element.meta.emergency && PlaneUtils.isEmergencySquawk(aircraft.squawk)) {
+                    PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) has emergency of type ${PlaneUtils.getEmergencyType(aircraft.squawk)}`);
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_EMERGENCY, element, this, {squawk: aircraft.squawk});
                 }
                 //check time
                 if (!aircraft.onGround
                     && aircraft.barometricAltitude !== null
                     && aircraft.barometricAltitude < PlaneAlert.config.thresholds.takeoff
-                    && this.aircraft[i].meta.onGround) {
+                    && element.meta.onGround) {
                     //Plane takeoff
-                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
+                    const nearestAirport = GeoUtils.findNearestAirport(element, this.allowedAirports);
                     if (nearestAirport !== null) {
-                        PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
+                        PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
                     } else {
-                        PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) took off`);
+                        PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) took off`);
                     }
-                    EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, element, this, {nearestAirport: nearestAirport?.airport});
                 }
                 if (aircraft.onGround
                     && aircraft.barometricAltitude !== null
                     && aircraft.barometricAltitude < PlaneAlert.config.thresholds.landing
-                    && !this.aircraft[i].meta.onGround) {
-                    PlaneAlert.log.info(`Plane ${this.aircraft[i].icao} is landing`);
+                    && !element.meta.onGround) {
+                    PlaneAlert.log.info(`Plane ${element.icao} is landing`);
                     //Plane landing
-                    const nearestAirport = GeoUtils.findNearestAirport(this.aircraft[i], this.allowedAirports);
+                    const nearestAirport = GeoUtils.findNearestAirport(element, this.allowedAirports);
                     if (nearestAirport !== null) {
-                        PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) landed at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
+                        PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) landed at ${nearestAirport.airport.name} (${nearestAirport.airport.icao})`);
                     } else {
-                        PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) landed`);
+                        PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) landed`);
                     }
-                    EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, this.aircraft[i], this, {nearestAirport: nearestAirport?.airport});
+                    EventUtils.triggerEvent(PlaneEvents.PLANE_LAND, element, this, {nearestAirport: nearestAirport?.airport});
                 }
-                PlaneAlert.log.info(`Plane ${this.name} (${this.aircraft[i].icao}) is ${aircraft.onGround ? "on ground" : "in the air"} at ${aircraft.latitude}, ${aircraft.longitude} with altitude ${aircraft.barometricAltitude}`);
+                PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) is ${aircraft.onGround ? "on ground" : "in the air"} at ${aircraft.latitude}, ${aircraft.longitude} with altitude ${aircraft.barometricAltitude}`);
 
-                this.aircraft[i].meta.liveTrack = true;
-                this.aircraft[i].meta.lastSeen = new Date().getTime();
-                this.aircraft[i].meta.onGround = aircraft.onGround;
-                this.aircraft[i].meta.lat = aircraft.latitude;
-                this.aircraft[i].meta.lon = aircraft.longitude;
-                this.aircraft[i].meta.alt = aircraft.barometricAltitude;
-                this.aircraft[i].meta.squawk = aircraft.squawk;
-                this.aircraft[i].meta.emergency = PlaneUtils.isEmergencySquawk(aircraft.squawk);
+                element.meta.liveTrack = true;
+                element.meta.lastSeen = new Date().getTime();
+                element.meta.onGround = aircraft.onGround;
+                element.meta.lat = aircraft.latitude;
+                element.meta.lon = aircraft.longitude;
+                element.meta.alt = aircraft.barometricAltitude;
+                element.meta.squawk = aircraft.squawk;
+                element.meta.emergency = PlaneUtils.isEmergencySquawk(aircraft.squawk);
             }
 
             this.save();
