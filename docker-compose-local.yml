@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   planealert:
-    image: ghcr.io/nfacha/planealert:dev
+    build: '.'
     volumes:
       - ./config:/home/pptruser/app/config
     restart: unless-stopped

@@ -8,9 +8,11 @@ import TwitterUtils from "./TwitterUtils";
 import {Aircraft} from "../models/Aircraft";
 import {AircraftMeta, Airline} from "../models/Airline";
 import {PlaneUtils} from "./PlaneUtils";
+import {Squawk} from "../models/Squawk";
+import {Type} from "../models/Type";
 
 export class EventUtils {
-    public static async triggerEvent(event: PlaneEvents, aircraft: Aircraft | AircraftMeta, airline: Airline | null = null, data: any = null) {
+    public static async triggerEvent(event: PlaneEvents, aircraft: Aircraft | AircraftMeta, airline: Airline | Type | Squawk | null = null, data: any = null) {
         const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + aircraft.icao;
         let photoUrl = await PlaneSpotterUtils.getPhotoUrl(aircraft.icao);
         const notificationSettings = aircraft instanceof Aircraft ? aircraft.notifications : airline!.notifications;
@@ -111,7 +113,7 @@ export class EventUtils {
                         hasEmergencyScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
                     }
                     if (notificationSettings.discord.enabled) {
-                        let message = `**${notificationName}**${aircraft.callsign ? " flight " + aircraft.callsign : ""} (${aircraft.registration}) is squawking ${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) ** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
+                        let message = `**${notificationName}**${aircraft.callsign ? " flight " + aircraft.callsign : ""} is squawking ${data.squawk} ** (${PlaneUtils.getEmergencyType(data.squawk)}) ** at <t:${(new Date().getTime() / 1000).toFixed(0)}:t>\n${adsbExchangeLink}`;
 
                         for (const discord of notificationSettings.discord.webhooks) {
                             const hook = new WebhookClient({url: discord});
@@ -141,7 +143,7 @@ export class EventUtils {
                                 mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
                             await client.v2.tweet({
-                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) is squawking ${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                 media: hasEmergencyScreenshot ? {media_ids: [mediaId]} : undefined
                             })
                         }
