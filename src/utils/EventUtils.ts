@@ -55,10 +55,15 @@ export class EventUtils {
                             if (hasTakeoffScreenshot) {
                                 mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
-                            await client.v2.tweet({
-                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
-                            })
+                            try {
+                                await client.v2.tweet({
+                                    text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
+                                })
+                            } catch (e) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send tweet: ${e}`);
+                            }
+
                         }
                     }
                     resolve(true);
@@ -98,10 +103,15 @@ export class EventUtils {
                             if (hasLandingScreenshot) {
                                 mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
-                            await client.v2.tweet({
-                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
-                            })
+                            try {
+                                await client.v2.tweet({
+                                    text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
+                                })
+                            } catch (e) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send tweet: ${e}`);
+                            }
+
                         }
                     }
 
@@ -142,10 +152,15 @@ export class EventUtils {
                             if (hasEmergencyScreenshot) {
                                 mediaId = await client.v1.uploadMedia(`/tmp/${aircraft.icao}.png`);
                             }
-                            await client.v2.tweet({
-                                text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                media: hasEmergencyScreenshot ? {media_ids: [mediaId]} : undefined
-                            })
+                            try {
+                                await client.v2.tweet({
+                                    text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    media: hasEmergencyScreenshot ? {media_ids: [mediaId]} : undefined
+                                })
+                            } catch (e) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send tweet: ${e}`);
+                            }
+
                         }
                     }
 
