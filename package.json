@@ -1,0 +1,43 @@
+{
+  "name": "planealert",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node_modules/.bin/tsc",
+    "start": "node build/index.js",
+    "copy-config": "rm -rf ./build/config/* && cp -r ./config/ ./build/",
+    "dev": "npm run copy-config && tsc && node build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nfacha/PlaneAlert.git"
+  },
+  "author": "",
+  "license": "GPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/nfacha/PlaneAlert/issues"
+  },
+  "homepage": "https://github.com/nfacha/PlaneAlert#readme",
+  "dependencies": {
+    "@sentry/node": "^6.16.1",
+    "@sentry/tracing": "^6.16.1",
+    "@types/node": "^17.0.10",
+    "axios": "^0.25.0",
+    "convert-csv-to-json": "^1.3.1",
+    "discord-webhook-node": "^1.1.8",
+    "discord.js": "^14.3.0",
+    "pg": "^8.7.1",
+    "puppeteer": "^16.1.0",
+    "ts-node": "^10.4.0",
+    "tslog": "^3.3.1",
+    "twitter-api-v2": "^1.11.0",
+    "typeorm": "^0.2.41",
+    "typescript": "^4.5.5",
+    "yaml": "^2.1.1"
+  }
+}

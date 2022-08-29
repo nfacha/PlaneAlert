@@ -1,0 +1,29 @@
+tracksource:
+  primary: FachaDev
+
+  FachaDev:
+    token: null
+
+  vrs:
+    base: null
+    username: null
+    password: null
+
+refreshInterval: 5
+
+thresholds:
+  takeoff: 1000
+  landing: 10000
+  signalLoss: 5
+  landingNearestSuitableAirportDistance: 5
+
+telemetry:
+  sentry:
+    dsn: null
+
+twitter:
+  appToken: null
+  appSecret: null
+
+log:
+  level: DEBUG

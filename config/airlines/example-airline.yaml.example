@@ -1,0 +1,20 @@
+name: Porter Airlines
+icao: "POE"
+allowedAirports:
+  - large_airport
+  - medium_airport
+  - small_airport
+
+aircraft: []
+
+notifications:
+  includeScreenshots: true
+  discord:
+    enabled: false
+    webhooks: []
+  twitter:
+    enabled: false
+    accounts:
+      - username: PlaneAlert
+        accessToken: ""
+        accessSecret: ""

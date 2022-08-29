@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+
+  planealert:
+    image: ghcr.io/nfacha/planealert:master
+    volumes:
+      - ./config:/home/pptruser/app/config
+    restart: unless-stopped
+    security_opt:
+      - seccomp=chrome.json

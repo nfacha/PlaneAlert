@@ -1,0 +1,29 @@
+name: Test
+icao: "406E10"
+registration: null
+allowedAirports:
+  - large_airport
+  - medium_airport
+  - small_airport
+
+meta:
+  lastSeen: null
+  onGround: null
+  liveTrack: null
+  squawk: null
+  lat: null
+  lon: null
+  alt: null
+  emergency: false
+
+notifications:
+  includeScreenshots: true
+  discord:
+    enabled: false
+    webhooks: []
+  twitter:
+    enabled: false
+    accounts:
+      - username: PlaneAlert
+        accessToken: ""
+        accessSecret: ""
