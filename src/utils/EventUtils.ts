@@ -57,7 +57,7 @@ export class EventUtils {
                             }
                             try {
                                 await client.v2.tweet({
-                                    text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    text: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                     media: hasTakeoffScreenshot ? {media_ids: [mediaId]} : undefined
                                 })
                             } catch (e) {
@@ -105,7 +105,7 @@ export class EventUtils {
                             }
                             try {
                                 await client.v2.tweet({
-                                    text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    text: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                     media: hasLandingScreenshot ? {media_ids: [mediaId]} : undefined
                                 })
                             } catch (e) {
@@ -154,7 +154,7 @@ export class EventUtils {
                             }
                             try {
                                 await client.v2.tweet({
-                                    text: `${notificationName}${aircraft.callsign ? " flight " + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    text: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                     media: hasEmergencyScreenshot ? {media_ids: [mediaId]} : undefined
                                 })
                             } catch (e) {
