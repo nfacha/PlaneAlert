@@ -7,6 +7,17 @@ import {PlaneEvents} from "../enum/PlaneEvents";
 import {EventUtils} from "../utils/EventUtils";
 import {PlaneUtils} from "../utils/PlaneUtils";
 
+export interface AircraftMetaInterface {
+    lastSeen: number;
+    onGround: boolean;
+    liveTrack: boolean;
+    squawk: number | null;
+    lat: number;
+    lon: number;
+    alt: number;
+    emergency: boolean;
+}
+
 export class Aircraft {
 
     public fileName: string;
@@ -15,14 +26,14 @@ export class Aircraft {
     public registration: string;
     public allowedAirports: string[];
     public refreshInterval: number;
-    public callsign: string;
+    public callsign: string | null;
 
     ///
-    public meta = {
+    public meta: AircraftMetaInterface = {
         lastSeen: 0,
         onGround: false,
         liveTrack: false,
-        squawk: "",
+        squawk: null,
         lat: 0,
         lon: 0,
         alt: 0,
@@ -93,7 +104,10 @@ export class Aircraft {
 
     public async check() {
         PlaneAlert.log.info(`Checking aircraft ${this.name} (${this.icao})`);
-        const data = await PlaneAlert.trackSource?.getPlaneStatus(this.icao);
+        if (!PlaneAlert.trackSource) {
+            return;
+        }
+        const data = await PlaneAlert.trackSource.getPlaneStatus(this.icao);
         if (data === null) {
             // PlaneAlert.log.debug(`Plane ${this.name} (${this.icao}) returned no data`);
             if (!this.meta.onGround) {
@@ -164,9 +178,15 @@ export class Aircraft {
             this.meta.liveTrack = true;
             this.meta.lastSeen = new Date().getTime();
             this.meta.onGround = data.onGround;
-            this.meta.lat = data.latitude;
-            this.meta.lon = data.longitude;
-            this.meta.alt = data.barometricAltitude;
+            if (data.latitude != null && data.longitude != null) {
+                this.meta.lat = data.latitude;
+                this.meta.lon = data.longitude;
+            } else {
+                return;
+            }
+            if (data.barometricAltitude != null) {
+                this.meta.alt = data.barometricAltitude;
+            }
             this.meta.squawk = data.squawk;
             this.meta.emergency = PlaneUtils.isEmergencySquawk(data.squawk);
         }
