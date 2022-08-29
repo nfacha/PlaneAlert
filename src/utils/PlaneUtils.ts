@@ -8,6 +8,8 @@ export class PlaneUtils {
     }
 
     public static getEmergencyType(squawk: number | null): string {
+        squawk = Number(squawk);
+
         switch (squawk) {
             case 7500:
                 return 'Hijack';
