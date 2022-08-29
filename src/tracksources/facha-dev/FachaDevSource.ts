@@ -31,7 +31,7 @@ export class FachaDevSource implements TrackSource {
                     return null;
                 }
                 const state = rx.data;
-                if (state.error !== undefined) {
+                if (state.length === 0) {
                     resolve(null);
                 }
 
@@ -68,7 +68,7 @@ export class FachaDevSource implements TrackSource {
                     return null;
                 }
                 const state = rx.data;
-                if (state.error !== undefined) {
+                if (state.length === 0) {
                     resolve(null);
                 }
                 let aircraft: PlaneTrackResponse[] = [];
@@ -103,7 +103,7 @@ export class FachaDevSource implements TrackSource {
                     return null;
                 }
                 const state = rx.data;
-                if (state.error !== undefined) {
+                if (state.length === 0) {
                     resolve(null);
                 }
                 let aircraft: PlaneTrackResponse[] = [];
@@ -138,7 +138,7 @@ export class FachaDevSource implements TrackSource {
                     return null;
                 }
                 const state = rx.data;
-                if (state.error !== undefined) {
+                if (state.length === 0) {
                     resolve(null);
                 }
 
