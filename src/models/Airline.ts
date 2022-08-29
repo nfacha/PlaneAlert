@@ -129,6 +129,11 @@ export class Airline {
 
     public async check() {
         PlaneAlert.log.debug("Checking airline " + this.name);
+        // Ensure that tracksource is not null or undefined
+        if (!PlaneAlert.trackSource) {
+            return;
+        }
+
         const data = await PlaneAlert.trackSource.getPlanesByOperator(this.icao);
 
         if (data === null) {

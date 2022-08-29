@@ -50,7 +50,7 @@ class Index {
     public log: Logger;
     public db: any;
     public config: Config;
-    public trackSource: OpenSkySource | any | undefined;
+    public trackSource: OpenSkySource | FachaDevSource | VirtualRadarServerSource;
     public airports: any = [];
     public regions: any = [];
     public countries: any = [];
@@ -77,6 +77,8 @@ class Index {
             });
             this.log.info("Sentry enabled");
         }
+        // Ensure that the track source is set
+
         const csvToJson = require('convert-csv-to-json');
         //check if file exists
         axios({
@@ -119,6 +121,7 @@ class Index {
                 this.log.info("Track source: Facha.Dev");
                 this.trackSource = new FachaDevSource();
                 break;
+            default: throw new Error("Track source not set");
         }
         this.loadAircraft();
         this.loadAirlines()
