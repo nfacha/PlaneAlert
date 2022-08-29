@@ -137,12 +137,12 @@ export class FachaDevSource implements TrackSource {
                 if (rx.status !== 200) {
                     return null;
                 }
-                const state = rx.data;
+                let state = rx.data;
                 if (state.length === 0) {
                     resolve(null);
                 }
 
-
+                state = state[0];
                 resolve({
                     icao24: icao24,
                     callsign: state['callsign'],
