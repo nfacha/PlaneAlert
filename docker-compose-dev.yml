@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
 
@@ -12,6 +12,6 @@ services:
         condition: on-failure
       resources:
         limits:
-          memory: "3g"
+          memory: 3G
     security_opt:
       - seccomp=chrome.json
