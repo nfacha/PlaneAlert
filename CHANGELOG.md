@@ -1,5 +1,12 @@
 # Changelog
 
+# Release V2.0.2 (2022-08-30)
+
+- Fix crash when there is no nearby airport on signal loss
+- Close browser on screenshot failure, to reduce memory usage
+- Add hashtag to callsign on Twitter posts
+- Catch Twitter errors (mostly because 429)
+
 # Release V2.0.1 (2022-08-29)
 
 - Update dependency
