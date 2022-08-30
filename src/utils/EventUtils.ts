@@ -22,6 +22,11 @@ export class EventUtils {
             switch (event) {
                 case PlaneEvents.PLANE_TAKEOFF:
                     let hasTakeoffScreenshot = false;
+                    if (data.nearestAirport === undefined) {
+                        PlaneAlert.log.warn(`Plane ${notificationName} (${aircraft.icao}) could not get nearest airport, not sending out notifications`);
+                        resolve(false);
+                        return;
+                    }
                     if (notificationSettings.includeScreenshots) {
                         hasTakeoffScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
                     }
@@ -70,6 +75,11 @@ export class EventUtils {
                     break;
                 case PlaneEvents.PLANE_LAND:
                     let hasLandingScreenshot = false;
+                    if (data.nearestAirport === undefined) {
+                        PlaneAlert.log.warn(`Plane ${notificationName} (${aircraft.icao}) could not get nearest airport, not sending out notifications`);
+                        resolve(false);
+                        return;
+                    }
                     if (notificationSettings.includeScreenshots) {
                         hasLandingScreenshot = await ScreenshotUtils.takeScreenshot(aircraft.icao);
                     }
