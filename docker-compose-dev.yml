@@ -7,5 +7,12 @@ services:
     volumes:
       - ./config:/home/pptruser/app/config
     restart: unless-stopped
+    pull_policy: always
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          memory: "3g"
     security_opt:
       - seccomp=chrome.json
