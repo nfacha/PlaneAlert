@@ -9,8 +9,6 @@ services:
     restart: unless-stopped
     pull_policy: always
     deploy:
-      restart_policy:
-        condition: on-failure
       resources:
         limits:
           memory: "3g"
