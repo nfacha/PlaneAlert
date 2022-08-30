@@ -21,12 +21,14 @@ export class ScreenshotUtils {
                     await page.goto(adsbExchangeLink, {waitUntil: 'networkidle2'});
                     await page.waitForSelector('#airplanePhoto');
                     await page.screenshot({path: `/tmp/${icao24}.png`});
-                    await browser.close();
+                    // await browser.close();
                     PlaneAlert.log.debug(`Plane screenshot for ${icao24} taken`);
                     resolve(true);
-                }).catch((err: any) => {
+                }).catch(async (err: any) => {
                 PlaneAlert.log.error(`Error taking plane screenshot for ${this.name} (${icao24}): ${err}`);
                 resolve(false);
+            }).finally(async (browser: Browser) => {
+                await browser.close();
             });
         });
     }
