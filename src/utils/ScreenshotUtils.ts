@@ -18,17 +18,15 @@ export class ScreenshotUtils {
                     const page = await browser.newPage();
                     await page.setJavaScriptEnabled(true);
                     await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36');
-                    await page.goto(adsbExchangeLink, {waitUntil: 'networkidle2'});
-                    await page.waitForSelector('#airplanePhoto');
-                    await page.screenshot({path: `/tmp/${icao24}.png`});
-                    // await browser.close();
+                    await page.goto(adsbExchangeLink, {waitUntil: 'networkidle2'}).catch(() => browser.close());
+                    await page.waitForSelector('#airplanePhoto').catch(() => browser.close());
+                    await page.screenshot({path: `/tmp/${icao24}.png`}).catch(() => browser.close());
+                    await browser.close();
                     PlaneAlert.log.debug(`Plane screenshot for ${icao24} taken`);
                     resolve(true);
                 }).catch(async (err: any) => {
                 PlaneAlert.log.error(`Error taking plane screenshot for ${this.name} (${icao24}): ${err}`);
                 resolve(false);
-            }).finally(async (browser: Browser) => {
-                await browser.close();
             });
         });
     }
