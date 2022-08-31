@@ -14,6 +14,19 @@
 
 ## Like this project? Don't forget to STAR it and follow it for future releases :)
 
+## Some Twitter accounts running PlaneAlert:
+
+[@PlaneMayday](https://twitter.com/PlaneMayday) - Tracking Aircraft declaring an emergency
+
+[@RyanairTracker](https://twitter.com/RyanairTracker) - Tracking Rayanair flights
+
+[@TrackerTap](https://twitter.com/TrackerTap) - Tracking TAP flights
+
+[@SataTrack](https://twitter.com/SataTrack) - Tracking SATA Air Azores and Azores Airlines flights
+
+[@RussianPlanes](https://twitter.com/RussianPlanes) - Planes known to be associated with the #Russian government or
+Russian oligartchs
+
 ## Features
 
 - Support multiple data sources (api.facha.dev, OpenSky or Virtual Radar Server), with an easy way to add your own
