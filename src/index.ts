@@ -17,6 +17,7 @@ interface Config {
         primary: TrackSource,
         FachaDev: {
             token: string | null,
+            liveModuleOverride: string | undefined,
         },
         vrs: {
             base: string | null,
@@ -120,8 +121,13 @@ class Index {
             case TrackSource.FACHADEV:
                 this.log.info("Track source: Facha.Dev");
                 this.trackSource = new FachaDevSource();
+                if (this.config.tracksource.FachaDev.liveModuleOverride !== undefined) {
+                    FachaDevSource.LIVE_AIRCRAFT_MODULE = this.config.tracksource.FachaDev.liveModuleOverride;
+                    this.log.warn(`Overriding live aircraft module to ${FachaDevSource.LIVE_AIRCRAFT_MODULE}`);
+                }
                 break;
-            default: throw new Error("Track source not set");
+            default:
+                throw new Error("Track source not set");
         }
         this.loadAircraft();
         this.loadAirlines()
