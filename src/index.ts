@@ -11,17 +11,22 @@ import YAML from "yaml";
 import {Airline} from "./models/Airline";
 import {Type} from "./models/Type";
 import {Squawk} from "./models/Squawk";
+import {Dump1090Source} from "./tracksources/dump1090-aircraft-json/Dump1090Source";
 
 interface Config {
     tracksource: {
         primary: TrackSource,
         FachaDev: {
             token: string | null,
+            liveModuleOverride: string | undefined,
         },
         vrs: {
             base: string | null,
             username: string | null,
             password: string | null,
+        },
+        dump1090: {
+            base: string | null,
         },
         // Add more track sources here
     },
@@ -120,8 +125,17 @@ class Index {
             case TrackSource.FACHADEV:
                 this.log.info("Track source: Facha.Dev");
                 this.trackSource = new FachaDevSource();
+                if (this.config.tracksource.FachaDev.liveModuleOverride !== undefined) {
+                    FachaDevSource.LIVE_AIRCRAFT_MODULE = this.config.tracksource.FachaDev.liveModuleOverride;
+                    this.log.warn(`Overriding live aircraft module to ${FachaDevSource.LIVE_AIRCRAFT_MODULE}`);
+                }
                 break;
-            default: throw new Error("Track source not set");
+            case TrackSource.DUMP1090:
+                this.log.info("Track source: Dump1090");
+                this.trackSource = new Dump1090Source();
+                break;
+            default:
+                throw new Error("Track source not set");
         }
         this.loadAircraft();
         this.loadAirlines()

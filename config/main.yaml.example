@@ -9,6 +9,9 @@ tracksource:
     username: null
     password: null
 
+  dump1090:
+    base: http://10.0.3.20:8080/data/aircraft.json
+
 refreshInterval: 5
 
 thresholds:
