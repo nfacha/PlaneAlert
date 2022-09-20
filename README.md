@@ -43,7 +43,7 @@ Russian oligartchs
 
 The following TrackSources are supported:
 
-- FachaDev - This is the default and RECOMENDED TrackSource, that support all current Features | https://api.facha.dev
+- FachaDev - This is the default and RECOMMENDED TrackSource, that support all current Features | https://api.facha.dev
 - VRS - This connects to your own Virtual Radar Server | (Self-Hosted)
 - OPSN - OpenSkyNetwork | (https://openskynetwork.github.io/opensky-api/rest.html)
 - dump1090 - Dump1090 Aircraft.Json | Get data from your local Dump1090 Feeder
