@@ -1,7 +1,6 @@
 # Changelog
 
-# Release V2.1.0 (2022-09-xx)
-
+# Release V2.1.0 (2022-09-20)
 - Add Dump1090 track source
 
 # Release V2.0.2 (2022-08-30)
