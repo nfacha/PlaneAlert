@@ -46,9 +46,9 @@ The following TrackSources are supported:
 - FachaDev - This is the default and RECOMENDED TrackSource, that support all current Features | https://api.facha.dev
 - VRS - This connects to your own Virtual Radar Server | (Self-Hosted)
 - OPSN - OpenSkyNetwork | (https://openskynetwork.github.io/opensky-api/rest.html)
-
-At this time airlines, squawk and type queries are only supported by the FachaDev TrackSource, and will not work if
-another source is selected
+- dump1090 - Dump1090 Aircraft.Json | Get data from your local Dump1090 Feeder
+  At this time airlines, squawk and type queries are only supported by the FachaDev TrackSource, and will not work if
+  another source is selected
 
 ## Usage
 
