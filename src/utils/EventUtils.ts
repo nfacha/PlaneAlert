@@ -50,7 +50,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.twitter.enabled) {
+                    if (notificationSettings.twitter.enabled && !PlaneAlert.config.twitter.muskKillSwitch) {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
@@ -128,7 +128,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.twitter.enabled) {
+                    if (notificationSettings.twitter.enabled && !PlaneAlert.config.twitter.muskKillSwitch) {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
@@ -203,7 +203,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.twitter.enabled) {
+                    if (notificationSettings.twitter.enabled && !PlaneAlert.config.twitter.muskKillSwitch) {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';

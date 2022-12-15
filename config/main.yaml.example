@@ -27,6 +27,7 @@ telemetry:
 twitter:
   appToken: null
   appSecret: null
+  muskKillSwitch: false
 
 log:
   level: DEBUG

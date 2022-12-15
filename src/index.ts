@@ -45,6 +45,7 @@ interface Config {
     twitter: {
         appToken: string | null,
         appSecret: string | null,
+        muskKillSwitch: boolean,
     },
     log: {
         level: string,
