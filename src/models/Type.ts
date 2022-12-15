@@ -34,6 +34,15 @@ export class Type {
                     accessSecret: '',
                 }
             ]
+        },
+        mastodon: {
+            enabled: false,
+            accounts: [
+                {
+                    url: '',
+                    accessToken: '',
+                }
+            ]
         }
     }
 

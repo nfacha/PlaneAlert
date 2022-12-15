@@ -1,6 +1,6 @@
 {
   "name": "planealert",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "",
   "main": "index.js",
   "engines": {
@@ -31,6 +31,7 @@
     "convert-csv-to-json": "^1.3.1",
     "discord-webhook-node": "^1.1.8",
     "discord.js": "^14.3.0",
+    "masto": "^4.10.0",
     "pg": "^8.7.1",
     "puppeteer": "^16.1.0",
     "ts-node": "^10.4.0",

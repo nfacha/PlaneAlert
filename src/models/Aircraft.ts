@@ -54,6 +54,15 @@ export class Aircraft {
                     accessSecret: '',
                 }
             ]
+        },
+        mastodon: {
+            enabled: false,
+            accounts: [
+                {
+                    url: '',
+                    accessToken: '',
+                }
+            ]
         }
     }
 

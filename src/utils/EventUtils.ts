@@ -10,6 +10,7 @@ import {AircraftMeta, Airline} from "../models/Airline";
 import {PlaneUtils} from "./PlaneUtils";
 import {Squawk} from "../models/Squawk";
 import {Type} from "../models/Type";
+import {Attachment, login} from "masto";
 
 export class EventUtils {
     public static async triggerEvent(event: PlaneEvents, aircraft: Aircraft | AircraftMeta, airline: Airline | Type | Squawk | null = null, data: any = null) {
@@ -49,7 +50,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.twitter.enabled) {
+                    if (notificationSettings.twitter.enabled && !PlaneAlert.config.twitter.muskKillSwitch) {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
@@ -67,6 +68,31 @@ export class EventUtils {
                                 })
                             } catch (e) {
                                 PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send tweet: ${e}`);
+                            }
+
+                        }
+                    }
+                    if (notificationSettings.mastodon.enabled) {
+                        for (const account of notificationSettings.mastodon.accounts) {
+                            const masto = await login({
+                                url: account.url,
+                                accessToken: account.accessToken,
+                            });
+                            let media: Attachment;
+                            if (hasTakeoffScreenshot) {
+                                media = await masto.mediaAttachments.create({
+                                    file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
+                                });
+                            }
+                            try {
+                                await masto.statuses.create({
+                                    status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    visibility: 'direct',
+                                    // @ts-ignore
+                                    mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
+                                });
+                            } catch (e) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
                             }
 
                         }
@@ -102,7 +128,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.twitter.enabled) {
+                    if (notificationSettings.twitter.enabled && !PlaneAlert.config.twitter.muskKillSwitch) {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
@@ -120,6 +146,32 @@ export class EventUtils {
                                 })
                             } catch (e) {
                                 PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send tweet: ${e}`);
+                            }
+
+                        }
+                    }
+
+                    if (notificationSettings.mastodon.enabled) {
+                        for (const account of notificationSettings.mastodon.accounts) {
+                            const masto = await login({
+                                url: account.url,
+                                accessToken: account.accessToken,
+                            });
+                            let media: Attachment;
+                            if (hasLandingScreenshot) {
+                                media = await masto.mediaAttachments.create({
+                                    file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
+                                });
+                            }
+                            try {
+                                await masto.statuses.create({
+                                    status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    visibility: 'direct',
+                                    // @ts-ignore
+                                    mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
+                                });
+                            } catch (e) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
                             }
 
                         }
@@ -151,7 +203,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.twitter.enabled) {
+                    if (notificationSettings.twitter.enabled && !PlaneAlert.config.twitter.muskKillSwitch) {
                         for (const account of notificationSettings.twitter.accounts) {
                             const client = TwitterUtils.getTwitterClient(account.accessToken, account.accessSecret);
                             let mediaId = '';
@@ -169,6 +221,31 @@ export class EventUtils {
                                 })
                             } catch (e) {
                                 PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send tweet: ${e}`);
+                            }
+
+                        }
+                    }
+                    if (notificationSettings.mastodon.enabled) {
+                        for (const account of notificationSettings.mastodon.accounts) {
+                            const masto = await login({
+                                url: account.url,
+                                accessToken: account.accessToken,
+                            });
+                            let media: Attachment;
+                            if (hasEmergencyScreenshot) {
+                                media = await masto.mediaAttachments.create({
+                                    file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
+                                });
+                            }
+                            try {
+                                await masto.statuses.create({
+                                    status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
+                                    visibility: 'direct',
+                                    // @ts-ignore
+                                    mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
+                                });
+                            } catch (e) {
+                                PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
                             }
 
                         }
