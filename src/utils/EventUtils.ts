@@ -80,9 +80,13 @@ export class EventUtils {
                             });
                             let media: Attachment;
                             if (hasTakeoffScreenshot) {
-                                media = await masto.mediaAttachments.create({
-                                    file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
-                                });
+                                try {
+                                    media = await masto.mediaAttachments.create({
+                                        file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
+                                    });
+                                } catch (e) {
+                                    PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
+                                }
                             }
                             try {
                                 await masto.statuses.create({
@@ -159,9 +163,13 @@ export class EventUtils {
                             });
                             let media: Attachment;
                             if (hasLandingScreenshot) {
-                                media = await masto.mediaAttachments.create({
-                                    file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
-                                });
+                                try {
+                                    media = await masto.mediaAttachments.create({
+                                        file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
+                                    });
+                                } catch (e) {
+                                    PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
+                                }
                             }
                             try {
                                 await masto.statuses.create({
@@ -233,9 +241,13 @@ export class EventUtils {
                             });
                             let media: Attachment;
                             if (hasEmergencyScreenshot) {
-                                media = await masto.mediaAttachments.create({
-                                    file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
-                                });
+                                try {
+                                    media = await masto.mediaAttachments.create({
+                                        file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
+                                    });
+                                } catch (e) {
+                                    PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
+                                }
                             }
                             try {
                                 await masto.statuses.create({
