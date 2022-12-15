@@ -4,7 +4,7 @@
 
 - Add Mastodon Support
 - Add the `muskKillSwitch` flag to the main config, if set to `true` all Twitter broadcast capabilities are turned off,
-  without gaving to manually update them
+  without having to manually update them
 
 # Release V2.1.0 (2022-09-20)
 
