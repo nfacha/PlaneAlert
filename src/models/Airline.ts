@@ -38,6 +38,15 @@ export interface Notifications {
                 accessSecret: string,
             }
         ]
+    },
+    mastodon: {
+        enabled: false,
+        accounts: [
+            {
+                url: '',
+                accessToken: '',
+            }
+        ]
     }
 }
 
@@ -64,6 +73,15 @@ export class Airline {
                 {
                     accessToken: '',
                     accessSecret: '',
+                }
+            ]
+        },
+        mastodon: {
+            enabled: false,
+            accounts: [
+                {
+                    url: '',
+                    accessToken: '',
                 }
             ]
         }

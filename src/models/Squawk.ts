@@ -32,6 +32,15 @@ export class Squawk {
                     accessSecret: '',
                 }
             ]
+        },
+        mastodon: {
+            enabled: false,
+            accounts: [
+                {
+                    url: '',
+                    accessToken: '',
+                }
+            ]
         }
     }
 
