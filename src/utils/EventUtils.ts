@@ -72,7 +72,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.mastodon.enabled) {
+                    if (notificationSettings.mastodon !== undefined && notificationSettings.mastodon.enabled) {
                         for (const account of notificationSettings.mastodon.accounts) {
                             const masto = await login({
                                 url: account.url,
@@ -155,7 +155,7 @@ export class EventUtils {
                         }
                     }
 
-                    if (notificationSettings.mastodon.enabled) {
+                    if (notificationSettings.mastodon !== undefined && notificationSettings.mastodon.enabled) {
                         for (const account of notificationSettings.mastodon.accounts) {
                             const masto = await login({
                                 url: account.url,
@@ -233,7 +233,7 @@ export class EventUtils {
 
                         }
                     }
-                    if (notificationSettings.mastodon.enabled) {
+                    if (notificationSettings.mastodon !== undefined && notificationSettings.mastodon.enabled) {
                         for (const account of notificationSettings.mastodon.accounts) {
                             const masto = await login({
                                 url: account.url,
