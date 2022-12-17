@@ -14,17 +14,16 @@
 
 ## Like this project? Don't forget to STAR it and follow it for future releases :)
 
-## Some Twitter accounts running PlaneAlert:
+## Some Mastodon accounts running PlaneAlert:
 
-[@PlaneMayday](https://twitter.com/PlaneMayday) - Tracking Aircraft declaring an emergency
+[@planeemergency](https://airwaves.social/@planeemergency) - Tracking Aircraft declaring an emergency
 
-[@RyanairTracker](https://twitter.com/RyanairTracker) - Tracking Rayanair flights
+[@ryanairtracker](https://airwaves.social/@ryanairtracker) - Tracking Rayanair flights
 
-[@TrackerTap](https://twitter.com/TrackerTap) - Tracking TAP flights
+[@interestingplanes](https://airwaves.social/@interestingplanes) - Tracking the movement of some interesting military
+and civilian planes
 
-[@SataTrack](https://twitter.com/SataTrack) - Tracking SATA Air Azores and Azores Airlines flights
-
-[@RussianPlanes](https://twitter.com/RussianPlanes) - Planes known to be associated with the #Russian government or
+[@russiatracker](https://airwaves.social/@russiatracker) - Planes known to be associated with the #Russian government or
 Russian oligartchs
 
 ## Features
@@ -35,7 +34,7 @@ Russian oligartchs
 - Track whole Airlines
 - Track all aircrafts of a specific type (Like track all B-52s at once)
 - Track all aircraft broadcasting a specific squawk (such as 7500,7600,7700)
-- Send out alerts on Discord and Twitter (with screenshots)
+- Send out alerts on Discord, Twitter and Mastodon (with screenshots)
 - Calculate the nearest airport to the aircraft on signal loss
 - Full Docker support
 
