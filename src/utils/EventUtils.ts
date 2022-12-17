@@ -39,13 +39,21 @@ export class EventUtils {
                             PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasTakeoffScreenshot) {
                                 // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
-                                await hook.send({
-                                    username: notificationName + ' - ' + aircraft.registration,
-                                    avatarURL: photoUrl ? photoUrl : undefined,
-                                    content: message,
-                                    files: [rawFile]
-                                });
+                                try {
+                                    const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                    await hook.send({
+                                        username: notificationName + ' - ' + aircraft.registration,
+                                        avatarURL: photoUrl ? photoUrl : undefined,
+                                        content: message,
+                                        files: [rawFile]
+                                    });
+                                } catch (e) {
+                                    await hook.send({
+                                        username: notificationName + ' - ' + aircraft.registration,
+                                        avatarURL: photoUrl ? photoUrl : undefined,
+                                        content: message
+                                    });
+                                }
                             }
 
                         }
@@ -121,13 +129,21 @@ export class EventUtils {
                             PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasLandingScreenshot) {
                                 // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
-                                await hook.send({
-                                    username: notificationName + ' - ' + aircraft.registration,
-                                    avatarURL: photoUrl ? photoUrl : undefined,
-                                    content: message,
-                                    files: [rawFile]
-                                });
+                                try {
+                                    const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                    await hook.send({
+                                        username: notificationName + ' - ' + aircraft.registration,
+                                        avatarURL: photoUrl ? photoUrl : undefined,
+                                        content: message,
+                                        files: [rawFile]
+                                    });
+                                } catch (e) {
+                                    await hook.send({
+                                        username: notificationName + ' - ' + aircraft.registration,
+                                        avatarURL: photoUrl ? photoUrl : undefined,
+                                        content: message
+                                    });
+                                }
                             }
 
                         }
@@ -199,13 +215,21 @@ export class EventUtils {
                             const hook = new WebhookClient({url: discord});
                             PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasEmergencyScreenshot) {
-                                const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
-                                await hook.send({
-                                    username: notificationName + ' - ' + aircraft.registration,
-                                    avatarURL: photoUrl ? photoUrl : undefined,
-                                    content: message,
-                                    files: [rawFile]
-                                });
+                                try {
+                                    const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                    await hook.send({
+                                        username: notificationName + ' - ' + aircraft.registration,
+                                        avatarURL: photoUrl ? photoUrl : undefined,
+                                        content: message,
+                                        files: [rawFile]
+                                    });
+                                } catch (e) {
+                                    await hook.send({
+                                        username: notificationName + ' - ' + aircraft.registration,
+                                        avatarURL: photoUrl ? photoUrl : undefined,
+                                        content: message
+                                    });
+                                }
                             }
 
                         }
