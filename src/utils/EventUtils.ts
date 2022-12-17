@@ -39,7 +39,7 @@ export class EventUtils {
                             PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasTakeoffScreenshot) {
                                 // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
                                 await hook.send({
                                     username: notificationName + ' - ' + aircraft.registration,
                                     avatarURL: photoUrl ? photoUrl : undefined,
@@ -121,7 +121,7 @@ export class EventUtils {
                             PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasLandingScreenshot) {
                                 // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
                                 await hook.send({
                                     username: notificationName + ' - ' + aircraft.registration,
                                     avatarURL: photoUrl ? photoUrl : undefined,
@@ -199,8 +199,7 @@ export class EventUtils {
                             const hook = new WebhookClient({url: discord});
                             PlaneAlert.log.debug(`Plane ${notificationName} (${aircraft.icao}) sending discord notification to ${discord}`);
                             if (hasEmergencyScreenshot) {
-                                // Get RawFile of `/tmp/${aircraft.icao}.png`
-                                const rawFile = await fs.readFileSync(`/tmp/${aircraft.icao}.png`);
+                                const rawFile = fs.readFileSync(`/tmp/${aircraft.icao}.png`);
                                 await hook.send({
                                     username: notificationName + ' - ' + aircraft.registration,
                                     avatarURL: photoUrl ? photoUrl : undefined,
