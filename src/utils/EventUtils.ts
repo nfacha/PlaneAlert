@@ -92,6 +92,7 @@ export class EventUtils {
                                     media = await masto.mediaAttachments.create({
                                         file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
                                     });
+                                    PlaneAlert.log.debug(`Uploaded media to Mastodon: ${media.id} for ${aircraft.icao}`);
                                 } catch (e) {
                                     PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
                                 }
@@ -183,6 +184,7 @@ export class EventUtils {
                                     media = await masto.mediaAttachments.create({
                                         file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
                                     });
+                                    PlaneAlert.log.debug(`Uploaded media to Mastodon: ${media.id} for ${aircraft.icao}`);
                                 } catch (e) {
                                     PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
                                 }
@@ -268,6 +270,7 @@ export class EventUtils {
                                     media = await masto.mediaAttachments.create({
                                         file: fs.createReadStream(`/tmp/${aircraft.icao}.png`),
                                     });
+                                    PlaneAlert.log.debug(`Uploaded media to Mastodon: ${media.id} for ${aircraft.icao}`);
                                 } catch (e) {
                                     PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
                                 }
