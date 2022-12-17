@@ -1,6 +1,6 @@
 # Changelog
 
-# Release V2.2.0 (2022-12-x)
+# Release V2.2.0 (2022-12-17)
 
 - Add Mastodon Support
 - Add the `muskKillSwitch` flag to the main config, if set to `true` all Twitter broadcast capabilities are turned off,
