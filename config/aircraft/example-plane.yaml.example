@@ -27,3 +27,8 @@ notifications:
       - username: PlaneAlert
         accessToken: ""
         accessSecret: ""
+  mastodon:
+    enabled: false
+    accounts:
+      - url: ""
+        accessToken: ""

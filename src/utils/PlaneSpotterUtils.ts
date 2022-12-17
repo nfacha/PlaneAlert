@@ -1,4 +1,5 @@
 import axios from "axios";
+import {PlaneAlert} from "../index";
 
 export class PlaneSpotterUtils {
     public static async getPhotoUrl(icao: string): Promise<string | null> {
@@ -9,6 +10,9 @@ export class PlaneSpotterUtils {
                     photoUrl = photoData.data.photos[0].thumbnail_large.src
                     resolve(photoUrl);
                 }
+                resolve(null);
+            }).catch(err => {
+                PlaneAlert.log.error(`Error getting photo for ${icao}: ${err}`);
                 resolve(null);
             });
         });
