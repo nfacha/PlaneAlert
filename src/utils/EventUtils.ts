@@ -99,7 +99,7 @@ export class EventUtils {
                             try {
                                 await masto.statuses.create({
                                     status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                    visibility: 'direct',
+                                    visibility: 'public',
                                     // @ts-ignore
                                     mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
                                 });
@@ -190,7 +190,7 @@ export class EventUtils {
                             try {
                                 await masto.statuses.create({
                                     status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                    visibility: 'direct',
+                                    visibility: 'public',
                                     // @ts-ignore
                                     mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
                                 });
@@ -275,7 +275,7 @@ export class EventUtils {
                             try {
                                 await masto.statuses.create({
                                     status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
-                                    visibility: 'direct',
+                                    visibility: 'public',
                                     // @ts-ignore
                                     mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
                                 });
