@@ -24,6 +24,9 @@ export class GeoUtils {
         if (aircraft.meta.lon === null || aircraft.meta.lat === null || PlaneAlert.airports === null) {
             return null;
         }
+        if (aircraft.meta.lon === undefined || aircraft.meta.lat === undefined) {
+            return null;
+        }
         PlaneAlert.log.debug(`Plane ${this.name} (${aircraft.icao}) searching for nearest airport of ${aircraft.meta.lat}/${aircraft.meta.lon}`);
         let min_distance: number = PlaneAlert.config.thresholds.landingNearestSuitableAirportDistance;
         let nearest_airport = null;

@@ -86,7 +86,7 @@ export class EventUtils {
                                 url: account.url,
                                 accessToken: account.accessToken,
                             });
-                            let media: Attachment;
+                            let media: Attachment | undefined = undefined;
                             if (hasTakeoffScreenshot) {
                                 try {
                                     media = await masto.mediaAttachments.create({
@@ -101,8 +101,7 @@ export class EventUtils {
                                 await masto.statuses.create({
                                     status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) took off from ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                     visibility: 'public',
-                                    // @ts-ignore
-                                    mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
+                                    mediaIds: media ? [media.id] : undefined,
                                 });
                             } catch (e) {
                                 PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
@@ -178,7 +177,7 @@ export class EventUtils {
                                 url: account.url,
                                 accessToken: account.accessToken,
                             });
-                            let media: Attachment;
+                            let media: Attachment | undefined = undefined;
                             if (hasLandingScreenshot) {
                                 try {
                                     media = await masto.mediaAttachments.create({
@@ -193,8 +192,7 @@ export class EventUtils {
                                 await masto.statuses.create({
                                     status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} (#${aircraft.registration}) landed at ${data.nearestAirport.name} at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                     visibility: 'public',
-                                    // @ts-ignore
-                                    mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
+                                    mediaIds: media ? [media.id] : undefined,
                                 });
                             } catch (e) {
                                 PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);
@@ -264,7 +262,7 @@ export class EventUtils {
                                 url: account.url,
                                 accessToken: account.accessToken,
                             });
-                            let media: Attachment;
+                            let media: Attachment | undefined = undefined;
                             if (hasEmergencyScreenshot) {
                                 try {
                                     media = await masto.mediaAttachments.create({
@@ -279,8 +277,7 @@ export class EventUtils {
                                 await masto.statuses.create({
                                     status: `${notificationName}${aircraft.callsign ? " flight #" + aircraft.callsign : ""} is squawking #${data.squawk} (${PlaneUtils.getEmergencyType(data.squawk)}) at ${new Date().toLocaleString()}\n${adsbExchangeLink}`,
                                     visibility: 'public',
-                                    // @ts-ignore
-                                    mediaIds: hasTakeoffScreenshot ? [media.id] : undefined,
+                                    mediaIds: media ? [media.id] : undefined,
                                 });
                             } catch (e) {
                                 PlaneAlert.log.error(`Plane ${notificationName} (${aircraft.icao}) could not send post to Mastodon: ${e}`);

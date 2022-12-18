@@ -1,5 +1,10 @@
 # Changelog
 
+# Release V2.2.1 (2022-12-18)
+
+- Fix Mastodon not posting screenshots
+- Fix Take-Off messages not being sent
+
 # Release V2.2.0 (2022-12-17)
 
 - Add Mastodon Support

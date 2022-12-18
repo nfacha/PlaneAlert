@@ -199,7 +199,6 @@ export class Airline {
                         if (nearestAirport !== null) {
                             PlaneAlert.log.debug(`Plane ${this.name} (${element.icao}) is near ${nearestAirport.airport!.name!} (${nearestAirport.airport!.ident!}) and has lost signal`);
                             // Check altitude
-                            // @ts-ignore
                             if (element.meta.alt != null && element.meta.alt <= PlaneAlert.config.thresholds.landing) {
 
                                 PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) is at ${element.meta.alt} ft and has lost signal. Suspected landing`);
@@ -228,7 +227,6 @@ export class Airline {
                     if (nearestAirport !== null) {
                         PlaneAlert.log.info(`Plane ${this.name} (${element.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
                         // Check altitude
-                        // @ts-ignore
                         if (element.meta.alt != null && element.meta.alt <= PlaneAlert.config.thresholds.takeoff) {
                             EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, element, this, {nearestAirport: nearestAirport?.airport});
                         }
