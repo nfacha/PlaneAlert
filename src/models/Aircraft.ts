@@ -159,8 +159,7 @@ export class Aircraft {
                 if (nearestAirport !== null) {
                     PlaneAlert.log.info(`Plane ${this.name} (${this.icao}) took off at ${nearestAirport.airport.name} (${nearestAirport.airport.gps_code})`);
                     // Check altitude
-                    // @ts-ignore
-                    if (this.aircraft[i].meta.alt != null && this.aircraft[i].meta.alt <= PlaneAlert.config.thresholds.takeoff) {
+                    if (this.meta.alt != null && this.meta.alt <= PlaneAlert.config.thresholds.takeoff) {
                         EventUtils.triggerEvent(PlaneEvents.PLANE_TAKEOFF, this, null, {nearestAirport: nearestAirport?.airport});
                     }
                 } else {
