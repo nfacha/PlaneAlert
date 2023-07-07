@@ -1,5 +1,9 @@
 # Changelog
 
+# Release V2.2.2 (2023-07-07)
+
+- Update dependencies
+
 # Release V2.2.1 (2022-12-18)
 
 - Fix Mastodon not posting screenshots
