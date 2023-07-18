@@ -14,7 +14,8 @@ import {Attachment, login} from "masto";
 
 export class EventUtils {
     public static async triggerEvent(event: PlaneEvents, aircraft: Aircraft | AircraftMeta, airline: Airline | Type | Squawk | null = null, data: any = null) {
-        const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + aircraft.icao;
+        // const adsbExchangeLink = 'https://globe.adsbexchange.com/?icao=' + aircraft.icao;
+        const adsbExchangeLink = 'https://radarplane.com/?hex=' + aircraft.icao;
         let photoUrl = await PlaneSpotterUtils.getPhotoUrl(aircraft.icao);
         const notificationSettings = aircraft instanceof Aircraft ? aircraft.notifications : airline!.notifications;
         const notificationName = aircraft instanceof Aircraft ? aircraft.name : airline!.name;
