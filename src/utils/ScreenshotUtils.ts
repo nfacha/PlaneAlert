@@ -13,6 +13,7 @@ export class ScreenshotUtils {
                         width: 1920,
                         height: 1080,
                     },
+                    headless: true,
                 })
                 .then(async (browser: Browser) => {
                     const page = await browser.newPage();
@@ -42,6 +43,7 @@ export class ScreenshotUtils {
                         width: 1920,
                         height: 1080,
                     },
+                    headless: true,
                 })
                 .then(async (browser: Browser) => {
                     const page = await browser.newPage();
