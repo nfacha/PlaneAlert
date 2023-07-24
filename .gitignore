@@ -20,3 +20,5 @@ config/types/*.yaml.disabled
 config/squawk/*.yaml
 config/squawk/*.yaml.disabled
 config-server/*
+
+src/test.ts
