@@ -14,5 +14,5 @@ RUN mkdir -p /home/pptruser/app/config
 RUN chown -R pptruser:pptruser /home/pptruser/app/config
 USER pptruser
 RUN npm i
-#RUN npm run build
-CMD npm run dev
+RUN npm run build
+CMD npm run start
