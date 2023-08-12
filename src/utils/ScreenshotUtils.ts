@@ -57,6 +57,8 @@ export class ScreenshotUtils {
                         // @ts-ignore
                         return window.getComputedStyle(element).display === 'none';
                     });
+                    await page.waitForSelector('.fc-cta-consent');
+                    await page.click('.fc-cta-consent');
                     await page.screenshot({path: `/tmp/${icao24}.png`}).catch(() => browser.close());
                     await browser.close();
                     PlaneAlert.log.debug(`Plane screenshot for ${icao24} taken on RP`);
