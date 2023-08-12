@@ -12,6 +12,7 @@ import {Airline} from "./models/Airline";
 import {Type} from "./models/Type";
 import {Squawk} from "./models/Squawk";
 import {Dump1090Source} from "./tracksources/dump1090-aircraft-json/Dump1090Source";
+import {RadarPlaneSource} from "./tracksources/radarplane/RadarPlaneSource";
 
 interface Config {
     tracksource: {
@@ -28,7 +29,9 @@ interface Config {
         dump1090: {
             base: string | null,
         },
-        // Add more track sources here
+        radarPlane: {
+            apiKey: string | null,
+        }
     },
     refreshInterval: number,
     thresholds: {
@@ -56,7 +59,7 @@ class Index {
     public log: Logger;
     public db: any;
     public config: Config;
-    public trackSource: OpenSkySource | FachaDevSource | VirtualRadarServerSource;
+    public trackSource: OpenSkySource | FachaDevSource | VirtualRadarServerSource | RadarPlaneSource;
     public airports: any = [];
     public regions: any = [];
     public countries: any = [];
@@ -134,6 +137,10 @@ class Index {
             case TrackSource.DUMP1090:
                 this.log.info("Track source: Dump1090");
                 this.trackSource = new Dump1090Source();
+                break;
+            case TrackSource.RADARPLANE:
+                this.log.info("Track source: RadarPlane");
+                this.trackSource = new RadarPlaneSource();
                 break;
             default:
                 throw new Error("Track source not set");
