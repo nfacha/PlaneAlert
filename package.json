@@ -1,17 +1,17 @@
 {
   "name": "planealert",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "node_modules/.bin/tsc",
     "start": "node build/index.js",
     "copy-config": "rm -rf ./build/config/* && cp -r ./config/ ./build/",
-    "dev": "npm run copy-config && tsc && node build/index.js"
+    "dev": "npm run copy-config && tsc && node build/test.js"
   },
   "repository": {
     "type": "git",
@@ -32,12 +32,10 @@
     "discord-webhook-node": "^1.1.8",
     "discord.js": "^14.3.0",
     "masto": "^4.10.0",
-    "pg": "^8.7.1",
-    "puppeteer": "^16.1.0",
+    "puppeteer": "^21.0.3",
     "ts-node": "^10.4.0",
     "tslog": "^3.3.1",
     "twitter-api-v2": "^1.11.0",
-    "typeorm": "^0.2.41",
     "typescript": "^4.5.5",
     "yaml": "^2.1.1"
   }

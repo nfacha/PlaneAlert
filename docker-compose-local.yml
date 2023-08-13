@@ -9,3 +9,5 @@ services:
     restart: unless-stopped
     security_opt:
       - seccomp=chrome.json
+    cap_add:
+      - SYS_ADMIN

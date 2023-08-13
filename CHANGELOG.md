@@ -1,5 +1,11 @@
 # Changelog
 
+# Release V2.2.3 (WIP)
+
+- Use RadarPlane.com as screenshot source
+- Update node and puppeter and fix not workign chrome on recent builds
+- Add RadarPlane.com as track source
+
 # Release V2.2.2 (2023-07-07)
 
 - Update dependencies
